@@ -5,15 +5,15 @@
 
 class Configuration
 {
-
 	public:
-
 		//Constructor
 		Configuration(std::string directory, std::string fileConf, std::string filePid, std::string level, bool status, std::string user);
+		/*
 		//Create the pid file
 		bool createPid() const;
 		//Delete the pid file
 		bool deletePid() const;
+		*/
 		//Get the root directory
 	        std::string getDirectory() const;
 		//Get the configuration filename
@@ -28,9 +28,7 @@ class Configuration
 		std::string getUser() const;
 		//Load all configurations
 		void loadConfiguration() const;
-
 	private:
-
 		std::string m_directory;
 		std::string m_fileConf;
 		std::string m_filePid;
@@ -38,7 +36,7 @@ class Configuration
 		bool m_status;
 		std::string m_user;
 		//Check if the specified user exists
-		bool checkUser() const;
+		//bool checkUser() const;
 };
 
 #endif

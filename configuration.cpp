@@ -1,21 +1,26 @@
-#include "configuration.h"
-
-#include <string>
 #include <limits.h>
+#include <regex>
+#include <string>
 #include <unistd.h>
+
+#include "configuration.h"
 
 using namespace std;
 
 Configuration::Configuration(std::string directory, std::string fileConf, std::string filePid, std::string level, bool status, std::string user) : m_directory(""), m_fileConf("protsion.conf"), m_filePid("protsion.pid"),  m_level("i"), m_status(true), m_user("protsion") {
-
 	if (!directory.empty()) {
                 this->m_directory = directory;
         }
 	else {
-		//Get the executable full path name
+		//Get the executable full path name (filename included)
 		char 	result[PATH_MAX];
         	ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
         	this->m_directory = string(result, (count > 0) ? count : 0);
+		//Get the executable path name only
+		regex regex("(\\w|\\d|-|[.]){1,}$");
+		regex_replace("test/prout", regex, "$0");
+		//Checks some sub-directories
+		
 	}
 
 	if (!fileConf.empty()) {
@@ -49,14 +54,15 @@ Configuration::Configuration(std::string directory, std::string fileConf, std::s
         }
 
 }
-
+/*
 bool Configuration::createPid() const {
 	/* Attempt to open and lock the pid file */
+/*
         if (!this->m_filePid) {
         	this->m_filePid = this->m_directory + "run/" + this->m_filePid;
 		cout << this->m_filePid << endl;
 	}
-/*
+
 	pf = pidfile_open(pidfile_name, 0660, &op);
 
         if(!pf) {
@@ -82,11 +88,11 @@ bool Configuration::createPid() const {
 
         // Write the pid file.
         pidfile_write(pf);
-*/
+
 }
 
 bool Configuration::deletePid() const {
-/*
+
 	struct passwd *pw;
     uid_t uid;
     gid_t gid;
@@ -187,9 +193,9 @@ string Configuration::getUser() const {
 	return this->m_user;
 }
 
-void Configuration::loadConfiguration() const [
-
+void Configuration::loadConfiguration() const {
 	//Check if we need to deamonize the executable
+	/*
 	if(this->m_status) {
 		if(!this->createPid())
 			exit(EXIT_FAILURE);
@@ -198,4 +204,6 @@ void Configuration::loadConfiguration() const [
 		if(!this->deletePid())
 			exit(EXIT_FAILURE);
 	}
+	*/
 }
+
