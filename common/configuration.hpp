@@ -3,27 +3,20 @@
 
 #include <string>
 
+#include "database.hpp"
+
 class Configuration {
 
 	public:
 
 		//Constructor
-		Configuration(std::string directory, std::string filePid, std::string level, bool status, std::string user);
-		//Get the root directory
-	        std::string getDirectory(void) const;
-		//Get the pid filename
-		std::string getFilePid(void) const;
-		//Get the log level
-		std::string getLevel(void) const;
-		//Get the daemonize status
-		bool getStatus(void) const;
-		//Set the username
-		std::string getUser(void) const;
+		Configuration(Database Database, std::string database, std::string directory, std::string filePid, std::string level, bool status, std::string user);
 		//Load all configurations
-		void loadConfiguration(void) const;
+		bool loadConfiguration(Database Database) const;
 
 	private:
 
+		std::string m_database;
 		std::string m_directory;
 		std::string m_filePid;
 		std::string m_level;
@@ -31,9 +24,9 @@ class Configuration {
 		std::string m_user;
 
 		//Drop the user privileges
-		bool dropUserPrivileges(void) const;
+		bool dropUserPrivileges(Database Database) const;
 		//Open the pid file
-		bool createFilePid(void) const;
+		bool createFilePid(Database Database) const;
 
 };
 

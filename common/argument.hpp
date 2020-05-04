@@ -9,6 +9,8 @@ class Argument {
 
 		//Constructor
 		Argument();
+		//Get the database connection configuration
+		std::string getDatabase(void) const;
 		//Get the directory
 		std::string getDirectory(void) const;
 		//Get the configuration filename
@@ -30,6 +32,7 @@ class Argument {
 
 	private:
 
+		std::string m_database;
 		std::string m_directory;
 		std::string m_fileConf;
 		std::string m_filePid;

@@ -1,4 +1,4 @@
-#include <iostream>
+	#include <iostream>
 #include <string>
 
 #include "common/argument.hpp"
@@ -9,16 +9,34 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-	Argument 	Arg;
+	Argument 	Argument;
 
 	//Parse the executable arguments
-	Arg.parse(argc, argv);
+	Argument.parse(argc, argv);
 
-	//Initialize the configuration with the executable arguments
-	Configuration   Conf(Arg.getDirectory(), Arg.getFilePid(), Arg.getLevel(), Arg.getStatus(), Arg.getUser());
+	//Initialize the database connection
+        Database        Data(Argument.getDatabase(), Argument.getDirectory(), Argument.getLevel());
+	//Open the connection to the database
+        if(Data.openDatabase()) {
 
-	//Load all configurations
-	Conf.loadConfiguration();
+		Data.logDatabase("test");
 
-	return 0;
+		//Initialize the configuration with the executable arguments
+		Configuration   Conf(Data, Argument.getDatabase(), Argument.getDirectory(), Argument.getFilePid(), Argument.getLevel(), Argument.getStatus(), Argument.getUser());
+		//Load all configurations
+		if(Conf.loadConfiguration(Data)) {
+
+			Data.logDatabase("test");
+
+			//Close the connection to the database
+			Data.closeDatabase();
+
+			exit(EXIT_SUCCESS);
+
+		} else
+			 exit(EXIT_FAILURE);
+
+	} else
+		 exit(EXIT_FAILURE);
+
 }

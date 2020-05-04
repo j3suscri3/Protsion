@@ -3,20 +3,32 @@
 
 #include <string>
 
+#include "../extra/sqlite3.h"
+
 class Database {
 
 	public:
+
 		//Constructor
-		Database(std::string host, std::string database);
+		Database(std::string database, std::string directory, std::string level);
+		//Connection to the specific database
+                bool openDatabase(void);
+		//Close from the specific database
+		bool closeDatabase(void);
+		//Write a new log entry ot the file
+		bool logDatabase(std::string message) const;
+		//Write a new log entry to the database
+		bool writeDatabase_Log(std::string level, std::string message) const;
 
 	private:
 
-		std::string m_host;
 		std::string m_database;
-		//Connection to a specific database
-		bool openDatabase(void) const;
+		std::string m_user;
+		std::string m_password;
+		std::string m_directory;
+		std::string m_level;
+		sqlite3 *m_sqlite;
 
 };
 
 #endif
-

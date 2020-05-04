@@ -11,25 +11,31 @@ Argument::Argument() : m_status(true) {
 
 }
 
-std::string Argument::getDirectory(void) const {
+string Argument::getDatabase(void) const {
+
+	return this->m_database;
+
+}
+
+string Argument::getDirectory(void) const {
 
 	return this->m_directory;
 
 }
 
-std::string Argument::getFileConf(void) const {
+string Argument::getFileConf(void) const {
 
 	return this->m_fileConf;
 
 }
 
-std::string Argument::getFilePid(void) const {
+string Argument::getFilePid(void) const {
 
 	return this->m_filePid;
 
 }
 
-std::string Argument::getLevel(void) const {
+string Argument::getLevel(void) const {
 
         return this->m_level;
 
@@ -41,7 +47,7 @@ bool Argument::getStatus(void) const {
 
 }
 
-std::string Argument::getUser(void) const {
+string Argument::getUser(void) const {
 
 	return this->m_user;
 
@@ -54,34 +60,18 @@ void Argument::parse(int total, char *table[]) {
 
 	for(counter = 1; counter < total; counter++) {
 
-		if(!strcmp(table[counter], "-C")) {
-
-			//Argument incompleted
-                        if(counter == total-1 || strlen(table[counter+1])==0) {
-
-				cout << "\n-C requires an argument!\n" << endl;
-				this->showHelp(table[0]);
-				exit(EXIT_FAILURE);
-
-			}
-
-			//Save the custom configuration file name
-	                this->m_fileConf = table[counter+1];
-			counter += 1;
-			continue;
-
-                } else if(!strcmp(table[counter], "-d")) {
+		if(!strcmp(table[counter], "-!")) {
 
                         //Save the custom deamonize status
 			this->m_status = !this->m_status;
 			continue;
 
-                } else if(!strcmp(table[counter], "-D")) {
+                } else if(!strcmp(table[counter], "-d")) {
 
                         //Argument incompleted
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
-                                cout << "\n-D requires an argument!\n" << endl;
+                                cout << "\n-d requires an argument!\n" << endl;
                                 this->showHelp(table[0]);
 				exit(EXIT_FAILURE);
 
@@ -97,12 +87,12 @@ void Argument::parse(int total, char *table[]) {
 			this->showHelp(table[0]);
 			exit(EXIT_SUCCESS);
 
-		} else if(!strcmp(table[counter], "-L")) {
+		} else if(!strcmp(table[counter], "-l")) {
 
                         //Argument incompleted
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
-                                cout << "\n-L requires an argument!\n" << endl;
+                                cout << "\n-l requires an argument!\n" << endl;
                                 this->showHelp(table[0]);
 				exit(EXIT_FAILURE);
 
@@ -113,12 +103,12 @@ void Argument::parse(int total, char *table[]) {
 			counter += 1;
 			continue;
 
-                } else if(!strcmp(table[counter], "-P")) {
+                } else if(!strcmp(table[counter], "-p")) {
 
                         //Argument incompleted
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
-                                cout << "\n-P requires an argument!\n" << endl;
+                                cout << "\n-p requires an argument!\n" << endl;
                                 this->showHelp(table[0]);
 				exit(EXIT_FAILURE);
 
@@ -129,12 +119,28 @@ void Argument::parse(int total, char *table[]) {
 			counter += 1;
 			continue;
 
-                } else if(!strcmp(table[counter], "-U")) {
+		} else if(!strcmp(table[counter], "-s")) {
 
                         //Argument incompleted
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
-                                cout << "\n-U requires an argument!\n" << endl;
+                                cout << "\n-s requires an argument!\n" << endl;
+                                this->showHelp(table[0]);
+                                exit(EXIT_FAILURE);
+
+                        }
+
+                        //Save the custom database coonexion configuration
+                        this->m_database = table[counter+1];
+                        counter += 1;
+                        continue;
+
+                } else if(!strcmp(table[counter], "-u")) {
+
+                        //Argument incompleted
+                        if(counter == total-1 || strlen(table[counter+1])==0) {
+
+                                cout << "\n-u requires an argument!\n" << endl;
                                 this->showHelp(table[0]);
 				exit(EXIT_FAILURE);
 
@@ -165,17 +171,15 @@ void Argument::parse(int total, char *table[]) {
 void Argument::showHelp(string sh) const {
 
 	cout << "Usage: " << sh << " [arguments]" << "\n" << endl;
-	cout << "-C file		Define the specified configuration file instead of the default one" << endl;
-	cout << "-d		Run " << sh << " not like a daemon" << endl;
-	cout << "-D directory	Define the specified directory as the root" << endl;
-	cout << "-h		Print this help" << endl;
-	cout << "-L level	Record many messages depending on the level" << endl;
-	cout << "		e for error" << endl;
-	cout << "		w for warning" << endl;
-	cout << "		i for info (option by default)" << endl;
-	cout << "-P file		Use the specified name for the pid file instead of the default one"  << endl;
-	cout << "-U user		Run as the specified user instead of " << sh << endl;
-	cout << "-v		Print the version info of " << sh << "\n" << endl;
+	cout << "-!				Run " << sh << " not like a daemon" << endl;
+	cout << "-d directory			Define the specified directory as the root" << endl;
+	cout << "-h				Print this help" << endl;
+	cout << "-l level			Record many messages depending on the level" << endl;
+	cout << "				error / warning / info (option by default)" << endl;
+	cout << "-p file				Use the specified name for the pid file instead of the default one"  << endl;
+	cout << "-u user				Run as the specified user instead of " << sh << endl;
+	cout << "-v				Print the version info of " << sh << endl;
+	cout << "-s database:user@password	Define the database connection configuration\n" << endl;
 
 }
 
