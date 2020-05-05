@@ -1,4 +1,5 @@
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <errno.h>
 #include <fcntl.h>
@@ -16,11 +17,12 @@
 #include "configuration.hpp"
 #include "database.hpp"
 
+using namespace boost::asio::ip;
 using namespace boost::filesystem;
 using namespace boost::system;
 using namespace std;
 
-Configuration::Configuration(Database Data, string database, string directory, string filePid, string level, bool status, string user) : m_database("protsion:protsion@protsion"), m_directory(""), m_filePid("_protsion.pid"), m_level("info"), m_status(true), m_user("protsion") {
+Configuration::Configuration(Database Data, string database, string directory, string filePid, string level, bool status, string user, string interface) : m_database("protsion:protsion@protsion"), m_directory(""), m_filePid("_protsion.pid"), m_level("info"), m_status(true), m_user("protsion"), m_host(""), m_interface("") {
 
         path p_directory;
 	boost::system::error_code error;
@@ -140,6 +142,37 @@ Configuration::Configuration(Database Data, string database, string directory, s
 	if (!level.empty())
                 this->m_level = level;
 	Data.writeDatabase_Log("info", "[Configuration] Log (level) : " + this->m_level);
+
+	//Get the host name
+	this->m_host = host_name();
+	Data.writeDatabase_Log("info", "[Configuration] Host (name) : " + this->m_host);
+
+	//Get the interface network ipv4 and ipv6
+	boost::asio::io_service io_service;
+        tcp::resolver resolver(io_service);
+	tcp::resolver::query query(this->m_host, "");
+	tcp::resolver::iterator iterator = resolver.resolve(query);
+
+	while (iterator != tcp::resolver::iterator()) {
+
+    		address addr = (iterator++)->endpoint().address();
+		std::cout << addr.to_string() << std::endl;
+
+	}
+
+	//std::for_each(r_interface.resolve({this->m_host, ""}), {}, [](const auto& re) {
+
+	//	std::cout << re.endpoint().address() << '\n';
+
+    	//});
+
+	if (!interface.empty()) {
+
+
+	} else {
+
+
+	}
 
 }
 

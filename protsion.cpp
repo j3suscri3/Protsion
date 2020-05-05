@@ -19,14 +19,10 @@ int main(int argc, char *argv[]) {
 	//Open the connection to the database
         if(Data.openDatabase()) {
 
-		Data.logDatabase("test");
-
 		//Initialize the configuration with the executable arguments
-		Configuration   Conf(Data, Argument.getDatabase(), Argument.getDirectory(), Argument.getFilePid(), Argument.getLevel(), Argument.getStatus(), Argument.getUser());
+		Configuration   Conf(Data, Argument.getDatabase(), Argument.getDirectory(), Argument.getFilePid(), Argument.getLevel(), Argument.getStatus(), Argument.getUser(), "");
 		//Load all configurations
 		if(Conf.loadConfiguration(Data)) {
-
-			Data.logDatabase("test");
 
 			//Close the connection to the database
 			Data.closeDatabase();

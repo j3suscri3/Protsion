@@ -83,7 +83,8 @@ bool Database::openDatabase(void) {
 	//Open a connection to the specific database
 	if(sqlite3_open_v2(uri.c_str(), &m_sqlite, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_PRIVATECACHE | SQLITE_OPEN_NOFOLLOW, NULL) != SQLITE_OK) {
 
-		//printf("Impossible d'ouvrir la base de données : %s\n", sqlite3_errmsg(db));
+		string message =  sqlite3_errmsg(this->m_sqlite);
+		logDatabase("Can't open the database (" + message + ")");
 		closeDatabase();
 
 		return false;
@@ -98,9 +99,13 @@ bool Database::openDatabase(void) {
 
 bool Database::closeDatabase(void) {
 
-	if(sqlite3_close(this->m_sqlite) != SQLITE_OK)
+	if(sqlite3_close(this->m_sqlite) != SQLITE_OK) {
+
+		string message = sqlite3_errmsg(this->m_sqlite);
+		logDatabase("Can't close the database (" + message + ")");
 		return false;
-	else
+
+	} else
 		return true;
 
 }
@@ -110,9 +115,7 @@ bool Database::logDatabase(string message) const {
 	//Define the current date
 	time_t t_datetime = time(nullptr);
 	char s_datetime[100];
-	strftime(s_datetime, sizeof(s_datetime), "%A %c", localtime(&t_datetime));
-
-	cout << "TocToc" << endl;
+	strftime(s_datetime, sizeof(s_datetime), "%Y%m%d", localtime(&t_datetime));
 
 	std::ofstream log;
 	//Open the offline log file
@@ -125,7 +128,8 @@ bool Database::logDatabase(string message) const {
 	}
 
 	//Write the error into the offline log file
-	log << message;
+	strftime(s_datetime, sizeof(s_datetime), "%Y-%m-%d %H:%M:%S", localtime(&t_datetime));
+	log << "[" << s_datetime << "] " << message << "\n";
 
 	//Close the offline log file
 	log.close();
@@ -149,9 +153,6 @@ bool Database::writeDatabase_Log(string level, string message) const {
 	//If the sql request has an error
 	result = sqlite3_exec(this->m_sqlite, request.c_str(), NULL, 0, &error);
 
-	//cout << "result : " << result << endl;
-	//cout << "error : " << sqlite3_errmsg(this->m_sqlite) << endl;
-
 	//Check if the log level for saving
 	if((level == "warning" && this->m_level == "error") || (level == "info" && this->m_level != "info"))
 		return true;
@@ -159,8 +160,8 @@ bool Database::writeDatabase_Log(string level, string message) const {
 	//If we are an error with then we need be the memory free
 	if (result && error != NULL){
 
-		cout << "result : " << result << endl;
-        	cout << "error : " << sqlite3_errmsg(this->m_sqlite) << endl;
+		string message = error;
+		logDatabase("Can't write a log to the database (" + message + ")");
 
 		sqlite3_free(error);
 		error = NULL;
