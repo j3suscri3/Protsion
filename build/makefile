@@ -1,12 +1,12 @@
 CXX		=  g++
-CXXFLAGS	+= -std=c++17 -g -O2 -s -pedantic -Wall -lboost_system -lboost_filesystem -lstdc++fs -lsqlite3 -lpthread -I/usr/include/boost
+CXXFLAGS	+= -std=c++17 -g -O2 -s -pedantic -Wall -I/usr/include/boost
 DIRSOURCES	=  ../source/
 CXXSOURCES	=  $(DIRSOURCES)protsion.cpp $(DIRSOURCES)common/argument.cpp $(DIRSOURCES)common/configuration.cpp $(DIRSOURCES)common/database.cpp
 CXXRESOURCES	= $(wildcard $(DIRSOURCES)database/*.*)
 DIREXECUTABLE	=  ../bin/
 CXXEXECUTABLE	=  $(DIREXECUTABLE)protsion
 LDFLAGS		+= -L/home/mooninfo/sylverant/production/sqlite/lib/
-
+CXXLINKS	=  -lboost_system -lboost_filesystem -lstdc++fs -lsqlite3 -lpthread
 
 all: protsion
 
@@ -17,7 +17,7 @@ release:
 	done
 
 protsion: release
-	$(CXX) $(CXXFLAG) $(LDFLAGS) $(CXXSOURCES) -o $(CXXEXECUTABLE)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(CXXSOURCES) -o $(CXXEXECUTABLE) $(CXXLINKS)
 
 .PHONY: clean
 clean:
