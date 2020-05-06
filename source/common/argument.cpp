@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <regex>
 #include <string>
 
 #include "argument.hpp"
@@ -58,6 +59,9 @@ void Argument::parse(int total, char *table[]) {
 	Argument argument;
 	int counter;
 
+	//Get only the executable name
+	regex r_executable("^(.*)/");
+
 	for(counter = 1; counter < total; counter++) {
 
 		if(!strcmp(table[counter], "-!")) {
@@ -72,7 +76,7 @@ void Argument::parse(int total, char *table[]) {
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
                                 cout << "\n-d requires an argument!\n" << endl;
-                                this->showHelp(table[0]);
+                                this->showHelp(regex_replace(table[0], r_executable, "$3"));
 				exit(EXIT_FAILURE);
 
                         }
@@ -84,7 +88,7 @@ void Argument::parse(int total, char *table[]) {
 
                 } else if(!strcmp(table[counter], "-h")) {
 
-			this->showHelp(table[0]);
+			this->showHelp(regex_replace(table[0], r_executable, "$3"));
 			exit(EXIT_SUCCESS);
 
 		} else if(!strcmp(table[counter], "-l")) {
@@ -109,7 +113,7 @@ void Argument::parse(int total, char *table[]) {
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
                                 cout << "\n-p requires an argument!\n" << endl;
-                                this->showHelp(table[0]);
+                                this->showHelp(regex_replace(table[0], r_executable, "$3"));
 				exit(EXIT_FAILURE);
 
                         }
@@ -125,7 +129,7 @@ void Argument::parse(int total, char *table[]) {
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
                                 cout << "\n-s requires an argument!\n" << endl;
-                                this->showHelp(table[0]);
+                                this->showHelp(regex_replace(table[0], r_executable, "$3"));
                                 exit(EXIT_FAILURE);
 
                         }
@@ -141,7 +145,7 @@ void Argument::parse(int total, char *table[]) {
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
                                 cout << "\n-u requires an argument!\n" << endl;
-                                this->showHelp(table[0]);
+                                this->showHelp(regex_replace(table[0], r_executable, "$3"));
 				exit(EXIT_FAILURE);
 
                         }
@@ -153,13 +157,13 @@ void Argument::parse(int total, char *table[]) {
 
                 } else if(!strcmp(table[counter], "-v")) {
 
-                        this->showVersion(table[0]);
+                        this->showVersion(regex_replace(table[0], r_executable, "$3"));
 			exit(EXIT_SUCCESS);
 
                 } else {
 
 			cout << "\nIllegal command line argument: " << table[counter] << "\n" << endl;
-			this->showHelp(table[0]);
+			this->showHelp(regex_replace(table[0], r_executable, "$3"));
 			exit(EXIT_FAILURE);
 
 		}
@@ -171,20 +175,25 @@ void Argument::parse(int total, char *table[]) {
 void Argument::showHelp(string sh) const {
 
 	cout << "Usage: " << sh << " [arguments]" << "\n" << endl;
-	cout << "-!				Run " << sh << " not like a daemon" << endl;
-	cout << "-d directory			Define the specified directory as the root" << endl;
-	cout << "-h				Print this help" << endl;
-	cout << "-l level			Record many messages depending on the level" << endl;
-	cout << "				error / warning / info (option by default)" << endl;
-	cout << "-p file				Use the specified name for the pid file instead of the default one"  << endl;
-	cout << "-u user				Run as the specified user instead of " << sh << endl;
-	cout << "-v				Print the version info of " << sh << endl;
-	cout << "-s database:user@password	Define the database connection configuration\n" << endl;
+	cout << "-!			      Run " << sh << " not like a daemon." << endl;
+	cout << "-d <directory>		      Define the specified directory as the root." << endl;
+	cout << "-h			      Print this help." << endl;
+	cout << "-l <level>		      Record traces depending on the level" << endl;
+	cout << "			      error / warning / info (option by default)." << endl;
+	cout << "-p <file>		      Use the specified name for the pid file"  << endl;
+	cout << "	                      instead of the default one."  << endl;
+	cout << "-s <database:user@password>   Define the database connection configuration." << endl;
+	cout << "-u <user>		      Run as the specified user instead of " << sh << "." << endl;
+	cout << "-v			      Print the version info of " << sh << ".\n" << endl;
 
 }
 
 void Argument::showVersion(string sh) const {
 
-	cout << sh << endl;
+	cout << sh << " " << C_EXECUTABLE << endl;
+	cout << "Compiled on " << C_HOST << " with " << C_COMPILATOR << "." << endl;
+	cout << "The embedded database used is " << C_DATABASE << "." << endl;
+	cout << "This is free software; see the source for copying conditions.  There is NO" << endl;
+	cout << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." << endl;
 
 }

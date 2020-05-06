@@ -16,16 +16,9 @@ class Configuration {
 
 	private:
 
-		std::string m_database;
-		std::string m_directory;
-		std::string m_filePid;
-		std::string m_level;
+		std::string m_database, m_directory, m_filePid, m_level;
 		bool m_status;
-		std::string m_user;
-		std::string m_host;
-		std::string m_interface;
-		std::string m_ipv4;
-		std::string m_ipv6;
+		std::string m_user, m_host, m_interface, m_ipv4, m_ipv6;
 
 		//Drop the user privileges
 		bool dropUserPrivileges(Database Database) const;

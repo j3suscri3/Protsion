@@ -22,11 +22,7 @@ class Database {
 
 	private:
 
-		std::string m_database;
-		std::string m_user;
-		std::string m_password;
-		std::string m_directory;
-		std::string m_level;
+		std::string m_database, m_user, m_password, m_directory, m_level;
 		sqlite3 *m_sqlite;
 
 };

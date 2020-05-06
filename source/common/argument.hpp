@@ -32,14 +32,12 @@ class Argument {
 
 	private:
 
-		std::string m_database;
-		std::string m_directory;
-		std::string m_fileConf;
-		std::string m_filePid;
-		std::string m_level;
+		std::string m_database, m_directory, m_fileConf, m_filePid, m_level;
 		bool m_status;
 		std::string m_user;
 
 };
+
+inline std::string const C_EXECUTABLE, C_HOST, C_COMPILATOR, C_DATABASE;
 
 #endif
