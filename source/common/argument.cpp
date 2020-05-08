@@ -174,7 +174,8 @@ void Argument::parse(int total, char *table[]) {
 
 void Argument::showHelp(string sh) const {
 
-	cout << "Usage: " << sh << " [arguments]" << "\n" << endl;
+	cout << "Usage: " << sh << " [-!] [-d <directory>] [-h] [-l <level>]" << endl;
+	cout << "		[-s <database:user@password>] [-u <user>] [-v]\n" << endl;
 	cout << "-!			      Run " << sh << " not like a daemon." << endl;
 	cout << "-d <directory>		      Define the specified directory as the root." << endl;
 	cout << "-h			      Print this help." << endl;
@@ -185,15 +186,17 @@ void Argument::showHelp(string sh) const {
 	cout << "-s <database:user@password>   Define the database connection configuration." << endl;
 	cout << "-u <user>		      Run as the specified user instead of " << sh << "." << endl;
 	cout << "-v			      Print the version info of " << sh << ".\n" << endl;
+	cout << "For bug reporting, please go: <https://github.com/j3suscri3/Protsion/issues>." << endl;
 
 }
 
 void Argument::showVersion(string sh) const {
 
-	cout << sh << " " << C_EXECUTABLE << endl;
-	cout << "Compiled on " << C_HOST << " with " << C_COMPILATOR << "." << endl;
-	cout << "The embedded database used is " << C_DATABASE << "." << endl;
-	cout << "This is free software; see the source for copying conditions.  There is NO" << endl;
-	cout << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." << endl;
+	cout << sh << " " << E_VERSION << " " << E_ARCHITECTURE << " (GIT hash: " << E_HASH << ")" << endl;
+	cout << "Compiled on " << H_NAME << " " << H_CATEGORY << " " << H_VERSION << " (" << H_CODE << ") " << "with " << C_NAME << " " << C_VERSION << "." << endl;
+	cout << "The embedded database used is " << D_NAME << " " << D_VERSION << ".\n" << endl;
+	cout << "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>." <<endl;
+	cout << "This is free software: you are free to change and redistribute it." << endl;
+	cout << "There is NO WARRANTY, to the extent permitted by law.\n" << endl;
 
 }

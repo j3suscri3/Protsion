@@ -160,11 +160,11 @@ Configuration::Configuration(Database Data, string database, string directory, s
 
 	}
 
-	//std::for_each(r_interface.resolve({this->m_host, ""}), {}, [](const auto& re) {
+	std::for_each(resolver.resolve({this->m_host, ""}), {}, [](const auto& re) {
 
-	//	std::cout << re.endpoint().address() << '\n';
+		std::cout << re.endpoint().address() << '\n';
 
-    	//});
+    	});
 
 	if (!interface.empty()) {
 

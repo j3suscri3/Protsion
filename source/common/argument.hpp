@@ -38,6 +38,4 @@ class Argument {
 
 };
 
-inline std::string const C_EXECUTABLE, C_HOST, C_COMPILATOR, C_DATABASE;
-
 #endif
