@@ -84,7 +84,7 @@ bool Database::openDatabase(void) {
 	if(sqlite3_open_v2(uri.c_str(), &m_sqlite, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_PRIVATECACHE | SQLITE_OPEN_NOFOLLOW, NULL) != SQLITE_OK) {
 
 		string message =  sqlite3_errmsg(this->m_sqlite);
-		logDatabase("Can't open the database (" + message + ")");
+		this->logDatabase("Can't open the database (" + message + ")");
 		closeDatabase();
 
 		return false;
@@ -102,7 +102,7 @@ bool Database::closeDatabase(void) {
 	if(sqlite3_close(this->m_sqlite) != SQLITE_OK) {
 
 		string message = sqlite3_errmsg(this->m_sqlite);
-		logDatabase("Can't close the database (" + message + ")");
+		this->logDatabase("Can't close the database (" + message + ")");
 		return false;
 
 	} else
@@ -119,7 +119,7 @@ bool Database::logDatabase(string message) const {
 
 	std::ofstream log;
 	//Open the offline log file
-	log.open(this->m_directory + "protsion_" + s_datetime + ".log", std::fstream::in|std::fstream::app);
+	log.open(this->m_directory + "protsion_" + s_datetime + ".log", std::ofstream::out|std::ofstream::app);
 	if(log.fail()) {
 
 		cout << "Can't open the offline log file!" << endl;
@@ -139,6 +139,8 @@ bool Database::logDatabase(string message) const {
                 return false;
 
         }
+
+
 
 	return true;
 
@@ -161,7 +163,7 @@ bool Database::writeDatabase_Log(string level, string message) const {
 	if (result && error != NULL){
 
 		string message = error;
-		logDatabase("Can't write a log to the database (" + message + ")");
+		this->logDatabase("Can't write a log to the database (" + message + ")");
 
 		sqlite3_free(error);
 		error = NULL;

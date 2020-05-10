@@ -49,9 +49,7 @@ all: protsion
 
 release:
 	mkdir -p $(DIREXECUTABLE)database/; \
-	for CXXRESOURCE in $(CXXRESOURCES); do \
-		cp -f $$CXXRESOURCE $(DIREXECUTABLE)database/; \
-	done
+	for CXXRESOURCE in $(CXXRESOURCES); do cp -f $$CXXRESOURCE $(DIREXECUTABLE)database/; done
 
 protsion: release
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(CXXDECLARES) $(CXXSOURCES) -o $(CXXEXECUTABLE) $(CXXLINKS)

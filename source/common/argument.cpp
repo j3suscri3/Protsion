@@ -36,6 +36,18 @@ string Argument::getFilePid(void) const {
 
 }
 
+string Argument::getInterface(void) const {
+
+        return this->m_interface;
+
+}
+
+string Argument::getIpMode(void) const {
+
+        return this->m_ipMode;
+
+}
+
 string Argument::getLevel(void) const {
 
         return this->m_level;
@@ -56,9 +68,7 @@ string Argument::getUser(void) const {
 
 void Argument::parse(int total, char *table[]) {
 
-	Argument argument;
 	int counter;
-
 	//Get only the executable name
 	regex r_executable("^(.*)/");
 
@@ -91,13 +101,47 @@ void Argument::parse(int total, char *table[]) {
 			this->showHelp(regex_replace(table[0], r_executable, "$3"));
 			exit(EXIT_SUCCESS);
 
+		} else if(!strcmp(table[counter], "-i")) {
+
+			//Argument incompleted
+                        if(counter == total-1 || strlen(table[counter+1])==0) {
+
+                                cout << "\n-i requires 1 argument minimum or 2 arguments maximum!\n" << endl;
+                                this->showHelp(regex_replace(table[0], r_executable, "$3"));
+                                exit(EXIT_FAILURE);
+
+                        }
+
+			//Save the custom ip mode
+			if(strcmp(table[counter+1], "ipv4") && strcmp(table[counter+1], "ipv6") && strcmp(table[counter+1], "ipv4-ipv6")) {
+
+				cout << "\n-i requires like first argument the possible values <ipv4>, <ipv6> or <ipv4-ipv6>!\n" << endl;
+                                this->showHelp(regex_replace(table[0], r_executable, "$3"));
+                                exit(EXIT_FAILURE);
+
+			}
+                        this->m_ipMode = table[counter+1];
+
+			//Save the specified interface name
+			if(!strcmp(table[counter+2], "-!") || !strcmp(table[counter+2], "-d") || !strcmp(table[counter+2], "-h") ||
+			   !strcmp(table[counter+2], "-l") || !strcmp(table[counter+2], "-p") || !strcmp(table[counter+2], "-s") ||
+			   !strcmp(table[counter+2], "-u") || !strcmp(table[counter+2], "-v"))
+				counter += 1;
+			else {
+
+				this->m_interface = table[counter+2];
+                        	counter += 2;
+
+			}
+                        continue;
+
 		} else if(!strcmp(table[counter], "-l")) {
 
                         //Argument incompleted
                         if(counter == total-1 || strlen(table[counter+1])==0) {
 
                                 cout << "\n-l requires an argument!\n" << endl;
-                                this->showHelp(table[0]);
+                                this->showHelp(regex_replace(table[0], r_executable, "$3"));
 				exit(EXIT_FAILURE);
 
                         }
@@ -174,16 +218,18 @@ void Argument::parse(int total, char *table[]) {
 
 void Argument::showHelp(string sh) const {
 
-	cout << "Usage: " << sh << " [-!] [-d <directory>] [-h] [-l <level>]" << endl;
+	cout << "Usage: " << sh << " [-!] [-d <directory>] [-h] [-i <mode> | <interface>] [-l <level>]" << endl;
 	cout << "		[-s <database:user@password>] [-u <user>] [-v]\n" << endl;
 	cout << "-!			      Run " << sh << " not like a daemon." << endl;
 	cout << "-d <directory>		      Define the specified directory as the root." << endl;
-	cout << "-h			      Print this help." << endl;
+	cout << "-h			      Print this help page." << endl;
+	cout << "-i <mode> <interface>         Specify the ip mode and the network interface name" << endl;
+	cout << "			      ipv4 / ipv6 / ipv4-ipv6 (mode by default)." << endl;
 	cout << "-l <level>		      Record traces depending on the level" << endl;
-	cout << "			      error / warning / info (option by default)." << endl;
+	cout << "			      error / warning / info (level by default)." << endl;
 	cout << "-p <file>		      Use the specified name for the pid file"  << endl;
 	cout << "	                      instead of the default one."  << endl;
-	cout << "-s <database:user@password>   Define the database connection configuration." << endl;
+	cout << "-s <database:user@password>   Specify the database connection configuration." << endl;
 	cout << "-u <user>		      Run as the specified user instead of " << sh << "." << endl;
 	cout << "-v			      Print the version info of " << sh << ".\n" << endl;
 	cout << "For bug reporting, please go: <https://github.com/j3suscri3/Protsion/issues>." << endl;

@@ -22,7 +22,7 @@ using namespace boost::filesystem;
 using namespace boost::system;
 using namespace std;
 
-Configuration::Configuration(Database Data, string database, string directory, string filePid, string level, bool status, string user, string interface) : m_database("protsion:protsion@protsion"), m_directory(""), m_filePid("_protsion.pid"), m_level("info"), m_status(true), m_user("protsion"), m_host(""), m_interface("") {
+Configuration::Configuration(Database Database, string database, string directory, string filePid, string level, bool status, string user, string ipMode, string interface) : m_database("protsion:protsion@protsion"), m_directory(""), m_filePid("_protsion.pid"), m_level("info"), m_status(true), m_user("protsion"), m_host(""), m_ipMode("ipv4-ipv6"), m_interface("") {
 
         path p_directory;
 	boost::system::error_code error;
@@ -40,7 +40,7 @@ Configuration::Configuration(Database Data, string database, string directory, s
 
                         if (!create_directories(this->m_directory)) {
 
-                                Data.writeDatabase_Log("error", "Can't create the root directory " + this->m_directory);
+                                Database.writeDatabase_Log("error", "Can't create the root directory " + this->m_directory);
                                 exit(EXIT_FAILURE);
 
                         }
@@ -57,24 +57,24 @@ Configuration::Configuration(Database Data, string database, string directory, s
 
 	}
 
-        Data.writeDatabase_Log("info", "[Configuration] Root (directory) : " + this->m_directory);
+        Database.writeDatabase_Log("info", "[Configuration] Root (directory) : " + this->m_directory);
 
 	//Check the launch mode
         if (!status)
                 this->m_status = status;
         string s_status = to_string(this->m_status) == "1" ? "daemonize" : "not daemonize";
-        Data.writeDatabase_Log("info", "[Configuration] Launcher (mode) : " + s_status);
+        Database.writeDatabase_Log("info", "[Configuration] Launcher (mode) : " + s_status);
 
         //Check the user name
         if (!user.empty())
                 this->m_user = user;
-        Data.writeDatabase_Log("info", "[Configuration] Launcher (user) : " + this->m_user);
+        Database.writeDatabase_Log("info", "[Configuration] Launcher (user) : " + this->m_user);
 
 	//Check the database sub-directory
         p_directory = "database";
         if (!exists(p_directory))
                 create_directory(p_directory);
-        Data.writeDatabase_Log("info", "[Configuration] Database (path) : " + this->m_directory + "/" + p_directory.c_str() + "/");
+        Database.writeDatabase_Log("info", "[Configuration] Database (path) : " + this->m_directory + "/" + p_directory.c_str() + "/");
 
 	//Check the database connection configuration
 	regex r_database(":(.*)$");
@@ -104,9 +104,9 @@ Configuration::Configuration(Database Data, string database, string directory, s
                 s_password = regex_replace(this->m_database, r_password, "$3");
 
 	}
-	Data.writeDatabase_Log("info", "[Configuration] Database (file) : " + s_database);
-	Data.writeDatabase_Log("info", "[Configuration] Database (user) : " + s_user);
-	Data.writeDatabase_Log("info", "[Configuration] Database (password) : " + s_password);
+	Database.writeDatabase_Log("info", "[Configuration] Database (file) : " + s_database);
+	Database.writeDatabase_Log("info", "[Configuration] Database (user) : " + s_user);
+	Database.writeDatabase_Log("info", "[Configuration] Database (password) : " + s_password);
 
 	//Rename the database file
       	directory = canonical(current_path()).string();
@@ -125,7 +125,7 @@ Configuration::Configuration(Database Data, string database, string directory, s
         p_directory = "run";
         if (!exists(p_directory))
 		create_directory(p_directory);
-	Data.writeDatabase_Log("info", "[Configuration] PID (path) : " + this->m_directory + "/" + p_directory.c_str()+ "/");
+	Database.writeDatabase_Log("info", "[Configuration] PID (path) : " + this->m_directory + "/" + p_directory.c_str()+ "/");
 
 	//Check the pid file name
 	if (!filePid.empty()) {
@@ -136,79 +136,124 @@ Configuration::Configuration(Database Data, string database, string directory, s
                         this->m_filePid = "_" + filePid + ".pid";
 
         }
-	Data.writeDatabase_Log("info", "[Configuration] PID (file) : " + this->m_filePid);
+	Database.writeDatabase_Log("info", "[Configuration] PID (file) : " + this->m_filePid);
 
 	//Check the log level
 	if (!level.empty())
                 this->m_level = level;
-	Data.writeDatabase_Log("info", "[Configuration] Log (level) : " + this->m_level);
+	Database.writeDatabase_Log("info", "[Configuration] Log (level) : " + this->m_level);
 
 	//Get the host name
 	this->m_host = host_name();
-	Data.writeDatabase_Log("info", "[Configuration] Host (name) : " + this->m_host);
+	Database.writeDatabase_Log("info", "[Configuration] Host (name) : " + this->m_host);
 
-	//Get the interface network ipv4 and ipv6
-	boost::asio::io_service io_service;
-        tcp::resolver resolver(io_service);
-	tcp::resolver::query query(this->m_host, "");
-	tcp::resolver::iterator iterator = resolver.resolve(query);
+	//Get the ip mode(s) choosen
+	if (!ipMode.empty())
+        	this->m_ipMode = ipMode;
+	Database.writeDatabase_Log("info", "[Configuration] Ip (mode) : " + this->m_ipMode);
 
-	while (iterator != tcp::resolver::iterator()) {
-
-    		address addr = (iterator++)->endpoint().address();
-		std::cout << addr.to_string() << std::endl;
-
-	}
-
-	std::for_each(resolver.resolve({this->m_host, ""}), {}, [](const auto& re) {
-
-		std::cout << re.endpoint().address() << '\n';
-
-    	});
-
+	//Get the specified network interface ipv4 and/or ipv6 with its name
 	if (!interface.empty()) {
 
+		//Create the main service
+		boost::asio::io_service io_service;
+		//Create the resolver
+        	tcp::resolver resolver(io_service);
+		//Configure the resolver on localhost
+		tcp::resolver::query query("localhost", "");
+		//Get the iterator list
+		tcp::resolver::iterator iterator = resolver.resolve(query);
 
-	} else {
+		//For each network interface
+		while (iterator != tcp::resolver::iterator()) {
 
+			address ip = (iterator++)->endpoint().address();
+
+			//Get the ipv4 address
+			if (this->m_ipMode != "ipv6" && !ip.is_v6()) {
+
+				this->m_ipv4 = ip.to_string();
+				Database.writeDatabase_Log("info", "[Configuration] Ip (v4) : " + this->m_ipv4);
+
+			}
+
+			//Get the ipv6 address
+                        if (this->m_ipMode != "ipv4" && ip.is_v6()) {
+
+				this->m_ipv6 = ip.to_string();
+				Database.writeDatabase_Log("info", "[Configuration] Ip (v6) : " + this->m_ipv6);
+
+                        }
+
+		}
 
 	}
 
 }
 
-bool Configuration::createFilePid(Database Data) const {
+bool Configuration::createFilePid(Database Database) const {
 
         //Change the current path
-        current_path("run");
+	string filePid = this->m_directory + "/run/" + this->m_filePid;
+
+        //current_path("run");
         std::fstream stream;
 
         //Open the pid file
-        stream.open(this->m_filePid, std::fstream::in|std::fstream::out|std::fstream::binary|std::fstream::trunc);
+        stream.open(filePid, std::fstream::in|std::fstream::out|std::fstream::binary|std::fstream::trunc);
         if (stream.fail()) {
 
-		Data.writeDatabase_Log("error", "Can't open the pid file " + this->m_filePid);
+		Database.writeDatabase_Log("error", "Can't open the pid file " + this->m_filePid);
                 return false;
 
 	}
 
         //Write the pid into the file
         stream << getpid();
-        if (!stream.fail()) {
+	if (stream.fail()) {
 
-                stream.close();
-                Data.writeDatabase_Log("info", "[Configuration] Pid Number : " + to_string(getpid()));
-                return true;
-
-        } else {
-
-		Data.writeDatabase_Log("error", "Can't write into pid file " + this->m_filePid);
+		Database.writeDatabase_Log("error", "Can't write into pid file " + this->m_filePid);
                 return false;
 
 	}
 
+	stream.close();
+        Database.writeDatabase_Log("info", "[Configuration] Process (id) : " + to_string(getpid()));
+
+	//Change the permissions
+	path p_filePid = filePid;
+	boost::system::error_code error;
+        permissions(p_filePid, perms::owner_all|perms::group_all, error);
+	if (error) {
+
+		Database.writeDatabase_Log("error", "Can't change the permissions about the pid file " + this->m_filePid);
+		return false;
+
+	}
+
+	return true;
+
 }
 
-bool Configuration::dropUserPrivileges(Database Data) const {
+bool Configuration::deleteFilePid(Database Database) const {
+
+	path p_filePid = this->m_directory + "/run/"+ this->m_filePid;
+
+	cout << "delete" << endl;
+
+	//Delete the PID file
+	if (!remove(p_filePid)) {
+
+		Database.writeDatabase_Log("error", "Can't delete the pid file " + this->m_filePid);
+		return false;
+
+	}
+
+	return true;
+
+}
+
+bool Configuration::dropUserPrivileges(Database Database) const {
 
 	auto size = sysconf(_SC_GETPW_R_SIZE_MAX);
 	//Manage the FreeBSD special case when defining the buffer size
@@ -231,10 +276,10 @@ bool Configuration::dropUserPrivileges(Database Data) const {
 	if (!userId || !groupId) {
 
 		if (!userId)
-			Data.writeDatabase_Log("error", "Can't get the specified user id : '" + this->m_user + "'");
+			Database.writeDatabase_Log("error", "Can't get the specified user id : '" + this->m_user + "'");
 
 		if (!groupId)
-			Data.writeDatabase_Log("error", "Can't get the group id of the specified user '" + this->m_user + "'");
+			Database.writeDatabase_Log("error", "Can't get the group id of the specified user '" + this->m_user + "'");
 
 		return false;
 
@@ -243,7 +288,7 @@ bool Configuration::dropUserPrivileges(Database Data) const {
       		//Change the group privileges
 		if (setresgid(groupId, groupId, groupId) == -1) {
 
-			Data.writeDatabase_Log("error", "Can't change privileges to the group id of the specified user '" + this->m_user + "'");
+			Database.writeDatabase_Log("error", "Can't change privileges to the group id of the specified user '" + this->m_user + "'");
         		return false;
 
 		}
@@ -251,108 +296,77 @@ bool Configuration::dropUserPrivileges(Database Data) const {
 		//Change the user privileges
       		if (setresuid(userId, userId, userId) == -1) {
 
-			Data.writeDatabase_Log("error", "Can't change privileges to the specified user id '" + this->m_user + "'");
+			Database.writeDatabase_Log("error", "Can't change privileges to the specified user id '" + this->m_user + "'");
         		return false;
 
 		}
 
-		Data.writeDatabase_Log("info", "[Configuration] Specified User Id : " + to_string(userId));
-		Data.writeDatabase_Log("info", "[Configuration] Specified User Group Id : " + to_string(groupId));
+		Database.writeDatabase_Log("info", "[Configuration] Specified User Id : " + to_string(userId));
+		Database.writeDatabase_Log("info", "[Configuration] Specified User Group Id : " + to_string(groupId));
 
     	}
 	return true;
 
 }
 
-bool Configuration::loadConfiguration(Database Data) const {
+bool Configuration::loadConfiguration(Database Database) const {
 
 	//Check if we need to deamonize the executable
 	if(this->m_status) {
 
-  		pid_t processId = 0, sessionId = 0;
-
-		//Get the parent process id
-  		processId = fork();
-
-  		if (processId < 0) {
-
-			Data.writeDatabase_Log("error", "Can't get parent process id (" + to_string(processId) + ")");
-    			return false;
-
-  		}
-
-  		// If we got a good PID, then we can exit the parent process.
-  		if (processId > 0)
-			Data.writeDatabase_Log("warning", "Can get parent process id (" + to_string(processId) + ") and quit it");
-
-		Data.writeDatabase_Log("info", "[Configuration] Process Id : " + to_string(processId));
-
-		//Ignore signal sent from child to parent process
-		signal(SIGCHLD, SIG_IGN);
-
-		//Create a new session id for the child process
-  		sessionId = setpgid(0, 0);
-  		if (sessionId < 0) {
-
-			Data.writeDatabase_Log("error", "Can\'t get child process group id (" + to_string(sessionId) + ")");
-    			return false;
-
-  		}
-
-  		// Change the file mode mask
-  		umask(0);
-
-		Data.writeDatabase_Log("info", "[Configuration] Session Id : " + to_string(sessionId));
-
-        	//Open the garbage for the next returns
-		std::fstream stream;
-        	stream.open("/dev/null", std::fstream::in|std::fstream::out|std::fstream::trunc);
-		if (stream.fail()) {
-
-                	//LOG(FATAL) << "open(/dev/null) failed";
-			return false;
-
-		}
-
-		cin.rdbuf(stream.rdbuf());
-		if (cin.fail()) {
-
-			//LOF FATAL
-			return false;
-
-		}
-
-		cout.rdbuf(stream.rdbuf());
-                if (cout.fail()) {
-
-                        //LOF FATAL
-			return false;
-
-                }
-
-		cerr.rdbuf(stream.rdbuf());
-                if (cerr.fail()) {
-
-                        //LOF FATAL
-			return false;
-
-                }
-
-  		stream.close();
-
 		path p_filePid = this->m_filePid;
 
 		//If the pid file doesn't exist
-        	if (!exists(p_filePid))
-                	//Create the new pid file
-                	if(!this->createFilePid(Data))
-                        	unlink(this->m_filePid.c_str());
+        	if (!exists(p_filePid)) {
 
+			//Get the process id
+
+                	pid_t processId = fork();
+
+			//If the process id generation has failed!
+			if (processId < 0) {
+
+                        	Database.writeDatabase_Log("error", "Can't arrive to daemonize the server!");
+                        	return false;
+
+                	}
+
+			//Create the new pid file
+                	if (!this->createFilePid(Database)) {
+
+				//Delete the PID file
+				this->deleteFilePid(Database);
+
+				return false;
+
+			}
+
+		} else {
+
+			Database.writeDatabase_Log("error", "The server is already running!");
+			return false;
+
+		}
 
 	}
 
 	//Change the privileges to the new user
-	this->dropUserPrivileges(Data);
+	if(!this->dropUserPrivileges(Database))
+		return false;
+
+	return true;
+
+}
+
+bool Configuration::unloadConfiguration(Database Database) const {
+
+	if (this->m_status) {
+
+		//Delete the PID file
+		if (!this->deleteFilePid(Database))
+			return false;
+
+	}
 
 	return true;
 
