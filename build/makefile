@@ -11,18 +11,17 @@ D_NAME		=	sqlite
 D_VERSION	= 	$(shell sed -ne '/define SQLITE_VERSION / s/^.* "//p' $(DIRSOURCES)extra/sqlite3.h | tr -d '"')
 
 CXX		=  	g++
-CXXDECLARES	=  	-DE_VERSION=\"$(E_VERSION)\" \
-			-DE_HASH=\"$(E_HASH)\" \
-			-DE_ARCHITECTURE=\"$(E_ARCHITECTURE)\" \
-			-DH_NAME=\"$(H_NAME)\" \
-			-DH_CATEGORY=\"$(H_CATEGORY)\" \
-			-DH_VERSION=\"$(H_VERSION)\" \
-			-DH_CODE=\"$(H_CODE)\" \
-			-DK_VERSION=\"$(K_VERSION)\" \
-			-DC_NAME=\"$(CXX)\" \
-			-DC_VERSION=\"$(C_VERSION)\" \
-			-DD_NAME=\"$(D_NAME)\" \
-                        -DD_VERSION=\"$(D_VERSION)\"
+CXXDECLARES	=  	-DC_EXECUTABLEVERSION=\"$(E_VERSION)\" \
+			-DC_EXECUTABLEHASH=\"$(E_HASH)\" \
+			-DC_EXECUTABLEARCHITECTURE=\"$(E_ARCHITECTURE)\" \
+			-DC_HOSTNAME=\"$(H_NAME)\" \
+			-DC_HOSTCATEGORY=\"$(H_CATEGORY)\" \
+			-DC_HOSTVERSION=\"$(H_VERSION)\" \
+			-DC_HOSTCODE=\"$(H_CODE)\" \
+			-DC_COMPILATORNAME=\"$(CXX)\" \
+			-DC_COMPILATORVERSION=\"$(C_VERSION)\" \
+			-DC_DATABASENAME=\"$(D_NAME)\" \
+                        -DC_DATABASEVERSION=\"$(D_VERSION)\"
 CXXFLAGS	+= 	-std=c++17 \
 			-g \
 			-O2 \
@@ -30,12 +29,13 @@ CXXFLAGS	+= 	-std=c++17 \
 			-pedantic \
 			-Wall \
 			-I/usr/include/boost
-DIRSOURCES	=  	../source/
+DIRSOURCES	=  	../src/
 CXXSOURCES	=  	$(DIRSOURCES)protsion.cpp \
-			$(DIRSOURCES)common/argument.cpp \
-			$(DIRSOURCES)common/configuration.cpp \
-			$(DIRSOURCES)common/database.cpp
-CXXRESOURCES	=  	$(wildcard $(DIRSOURCES)database/*.*)
+			$(DIRSOURCES)core/cargument.cpp \
+			$(DIRSOURCES)core/cconfiguration.cpp \
+			$(DIRSOURCES)core/cdatabase.cpp
+DIRRESOURCES	=	$(DIRSOURCES)res/
+CXXRESOURCES	=  	$(wildcard $(DIRRESOURCES)*.*)
 DIREXECUTABLE	=  	../bin/
 CXXEXECUTABLE	=  	$(DIREXECUTABLE)protsion
 LDFLAGS		+= 	-L/home/mooninfo/sylverant/production/sqlite/lib/
