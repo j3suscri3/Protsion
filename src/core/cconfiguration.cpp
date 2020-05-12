@@ -1,3 +1,4 @@
+/*
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
@@ -14,23 +15,43 @@
 #include <sys/stat.h>
 #include <string>
 #include <unistd.h>
-
+*/
+#include <QDebug>
+#include <QHash>
 #include <QString>
 
 #include "cconfiguration.hpp"
-
+/*
 using namespace boost::asio::ip;
 using namespace boost::filesystem;
 using namespace boost::system;
 using namespace std;
+*/
+CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments) {
 
-CConfiguration::CConfiguration(bool processStatus, QString databaseName, QString databaseUsername, QString databasePassword, QString directory, QString processFilename, QString logLevel, QString processUsername, QString ipMode, QString interface) : M_CCDatabase(M_CDatabaseName, M_CDatabaseUsername, M_CDatabasePassword, M_CDirectory, M_CLogLevel), M_CProcessStatus(true), M_CDatabaseName("protsion"), M_CDatabaseUsername("protsion"), M_CDatabasePassword("protsion"), M_CDirectory(""), M_CProcessFilename("_protsion.pid"), M_CLogLevel("info"), M_CProcessUsername("protsion"), M_CHostname(""), M_CIpMode("ipv4-ipv6"), M_CInterface("") {
+	//Loop into the first level of the arguments hash
+	QHashIterator<QString, QHash<QString, QString>> iterator1(Arguments);
+	while(iterator1.hasNext()) {
+
+		iterator1.next();
+    		qInfo() << iterator1.key();
+
+		//Loop into the second level of the arguments hash
+		QHashIterator<QString, QString> iterator2(iterator1.value());
+        	while(iterator2.hasNext()) {
+
+                	iterator2.next();
+                	qInfo() << iterator2.key() << ":" << iterator2.value();
+
+        	}
+
+	}
 /*
 	this->M_CCDatabase = CDatabase(this->M_CDatabaseName, this->M_CDatabaseUsername, this->M_CDatabasePassword, this->M_CDirectory, this->M_CLevel);
 	//If the database connection has failed
 	if(!this->M_CCDatabase.open())
 		exit(EXIT_FAILURE);
-*/
+
 	mode_t mode = 0660;
 	if(opendir(this->M_CDirectory.c_str()) == NULL) {
 
@@ -75,7 +96,7 @@ CConfiguration::CConfiguration(bool processStatus, QString databaseName, QString
 		this->M_CDirectory = canonical(current_path()).string();
 
 	}
-	*/
+
         this->M_CCDatabase.writeLog("info", "[Configuration] Root (directory) : " + this->M_CDirectory);
 
 	cout << this->M_CDirectory << endl;
@@ -180,7 +201,7 @@ CConfiguration::CConfiguration(bool processStatus, QString databaseName, QString
 		}
 
 	}
-
+*/
 }
 
 bool CConfiguration::createProcessFile(void) const {

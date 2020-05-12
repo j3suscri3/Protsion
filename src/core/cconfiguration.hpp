@@ -1,6 +1,7 @@
 #ifndef CCONFIGURATION_HPP
 #define CCONFIGURATION_HPP
 
+#include <QHash>
 #include <QString>
 
 #include "cdatabase.hpp"
@@ -10,7 +11,7 @@ class CConfiguration {
 	public:
 
 		//Constructor
-		CConfiguration(bool processStatus, QString databaseName, QString databaseUsername, QString databasePassword, QString directory, QString processFilename, QString logLevel, QString ProcessUsername, QString ipMode, QString interface);
+		CConfiguration(QHash<QString, QHash<QString, QString>> Arguments);
 		//Load all configurations
 		bool load(void) const;
 		//Unload all configurations
@@ -18,9 +19,8 @@ class CConfiguration {
 
 	private:
 
-		CDatabase M_CCDatabase;
-		bool M_CProcessStatus;
-		QString M_CDatabaseName, M_CDatabaseUsername, M_CDatabasePassword, M_CDirectory, M_CProcessFilename, M_CLogLevel, M_CProcessUsername, M_CHostname, M_CIpMode, M_CInterface, M_CIpv4, M_CIpv6;
+		CDatabase M_CDatabase;
+		QHash<QString, QHash<QString, QString>> M_Configuration;
 
 		//Open the process file
                 bool createProcessFile(void) const;
