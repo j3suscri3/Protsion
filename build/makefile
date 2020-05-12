@@ -28,12 +28,16 @@ CXXFLAGS	+= 	-std=c++17 \
 			-s \
 			-pedantic \
 			-Wall \
-			-I/usr/include/boost
+			-fPIC \
+			-I/usr/include/boost \
+			-I/usr/include/x86_64-linux-gnu/qt5/ \
+			-I/usr/include/x86_64-linux-gnu/qt5/QtCore/
 DIRSOURCES	=  	../src/
 CXXSOURCES	=  	$(DIRSOURCES)protsion.cpp \
-			$(DIRSOURCES)core/cargument.cpp \
-			$(DIRSOURCES)core/cconfiguration.cpp \
-			$(DIRSOURCES)core/cdatabase.cpp
+			$(DIRSOURCES)core/cargument.cpp 
+#\
+#			$(DIRSOURCES)core/cconfiguration.cpp \
+#			$(DIRSOURCES)core/cdatabase.cpp
 DIRRESOURCES	=	$(DIRSOURCES)res/
 CXXRESOURCES	=  	$(wildcard $(DIRRESOURCES)*.*)
 DIREXECUTABLE	=  	../bin/
@@ -43,7 +47,8 @@ CXXLINKS	+= 	-lboost_system \
 			-lboost_filesystem \
 			-lstdc++fs \
 			-lsqlite3 \
-			-lpthread
+			-lpthread \
+			-lQt5Core \
 
 all: protsion
 

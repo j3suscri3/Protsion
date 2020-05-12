@@ -15,6 +15,8 @@
 #include <string>
 #include <unistd.h>
 
+#include <QString>
+
 #include "cconfiguration.hpp"
 
 using namespace boost::asio::ip;
@@ -22,7 +24,7 @@ using namespace boost::filesystem;
 using namespace boost::system;
 using namespace std;
 
-CConfiguration::CConfiguration(bool processStatus, string databaseName, string databaseUsername, string databasePassword, string directory, string processFilename, string logLevel, string processUsername, string ipMode, string interface) : M_CCDatabase(M_CDatabaseName, M_CDatabaseUsername, M_CDatabasePassword, M_CDirectory, M_CLogLevel), M_CProcessStatus(true), M_CDatabaseName("protsion"), M_CDatabaseUsername("protsion"), M_CDatabasePassword("protsion"), M_CDirectory(""), M_CProcessFilename("_protsion.pid"), M_CLogLevel("info"), M_CProcessUsername("protsion"), M_CHostname(""), M_CIpMode("ipv4-ipv6"), M_CInterface("") {
+CConfiguration::CConfiguration(bool processStatus, QString databaseName, QString databaseUsername, QString databasePassword, QString directory, QString processFilename, QString logLevel, QString processUsername, QString ipMode, QString interface) : M_CCDatabase(M_CDatabaseName, M_CDatabaseUsername, M_CDatabasePassword, M_CDirectory, M_CLogLevel), M_CProcessStatus(true), M_CDatabaseName("protsion"), M_CDatabaseUsername("protsion"), M_CDatabasePassword("protsion"), M_CDirectory(""), M_CProcessFilename("_protsion.pid"), M_CLogLevel("info"), M_CProcessUsername("protsion"), M_CHostname(""), M_CIpMode("ipv4-ipv6"), M_CInterface("") {
 /*
 	this->M_CCDatabase = CDatabase(this->M_CDatabaseName, this->M_CDatabaseUsername, this->M_CDatabasePassword, this->M_CDirectory, this->M_CLevel);
 	//If the database connection has failed
@@ -178,8 +180,6 @@ CConfiguration::CConfiguration(bool processStatus, string databaseName, string d
 		}
 
 	}
-
-	//M_CStatus(true), M_CDatabaseName("protsion"), M_CDatabaseUsername("protsion"), M_CDatabasePassword("protsion"), M_CDirectory(""), ProcessFile("_protsion.pid"), M_CLevel("info"), M_CUser("protsion"), M_CHost(""), M_CIpMode("ipv4-ipv6")
 
 }
 

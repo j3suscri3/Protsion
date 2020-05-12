@@ -7,6 +7,8 @@
 #include <regex>
 #include <string>
 
+#include <QString>
+
 #include "cdatabase.hpp"
 
 #include "../extra/sqlite3.h"
@@ -15,7 +17,7 @@ using namespace boost::filesystem;
 using namespace boost::system;
 using namespace std;
 
-CDatabase::CDatabase(string database, string username, string password, string directory, string level) : M_CDatabase(database), M_CUsername(username), M_CPassword(password), M_CDirectory(directory), M_CLevel(level),  M_CSqlite(0) {
+CDatabase::CDatabase(QString database, QString username, QString password, QString directory, QString level) : M_CDatabase(database), M_CUsername(username), M_CPassword(password), M_CDirectory(directory), M_CLevel(level),  M_CSqlite(0) {
 /*
 	//Get the database name
 	this->M_CDatabaseName = databaseName;
@@ -99,7 +101,7 @@ bool CDatabase::close(void) {
 
 }
 
-bool CDatabase::log(string message) const {
+bool CDatabase::log(QString message) const {
 
 	//Define the current date
 	time_t t_datetime = time(nullptr);
@@ -133,7 +135,7 @@ bool CDatabase::log(string message) const {
 
 }
 
-bool CDatabase::writeLog(string level, string message) const {
+bool CDatabase::writeLog(QString level, QString message) const {
 
 	char *error = nullptr;
 	std::string request = "INSERT INTO log VALUES (DATETIME('now', 'localtime'), '" + level + "', '" + message + "');";

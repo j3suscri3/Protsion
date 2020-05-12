@@ -1,7 +1,7 @@
 #ifndef CDATABASE_HPP
 #define CDATABASE_HPP
 
-#include <string>
+#include <QString>
 
 #include "../extra/sqlite3.h"
 
@@ -10,19 +10,19 @@ class CDatabase {
 	public:
 
 		//Constructor
-		CDatabase(std::string database, std::string username, std::string password, std::string directory, std::string level);
+		CDatabase(QString database, QString username, QString password, QString directory, QString level);
 		//Connection to the specific database
                 bool open(void);
 		//Close from the specific database
 		bool close(void);
 		//Write a new log entry ot the file
-		bool log(std::string message) const;
+		bool log(QString message) const;
 		//Write a new log entry to the database
-		bool writeLog(std::string level, std::string message) const;
+		bool writeLog(QString level, QString message) const;
 
 	private:
 
-		std::string M_CDatabase, M_CUsername, M_CPassword, M_CDirectory, M_CLevel;
+		QString M_CDatabase, M_CUsername, M_CPassword, M_CDirectory, M_CLevel;
 		sqlite3 *M_CSqlite;
 
 };
