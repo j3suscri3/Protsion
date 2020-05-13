@@ -1,51 +1,74 @@
-/*
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/asio.hpp>
-#include <boost/filesystem.hpp>
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <filesystem>
-#include <fstream>
-#include <grp.h>
-	#include <iostream>
-#include <pwd.h>
-#include <regex>
-#include <sys/signal.h>
-#include <sys/stat.h>
-#include <string>
-#include <unistd.h>
-*/
 #include <QDebug>
+#include <QDir>
 #include <QHash>
+#include <QNetworkInterface>
 #include <QString>
 
 #include "cconfiguration.hpp"
-/*
-using namespace boost::asio::ip;
-using namespace boost::filesystem;
-using namespace boost::system;
-using namespace std;
-*/
+
 CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments) {
 
 	//Loop into the first level of the arguments hash
-	QHashIterator<QString, QHash<QString, QString>> iterator1(Arguments);
-	while(iterator1.hasNext()) {
+	QHashIterator<QString, QHash<QString, QString>> ArgumentsIterator1(Arguments);
+	while(ArgumentsIterator1.hasNext()) {
 
-		iterator1.next();
-    		qInfo() << iterator1.key();
+		ArgumentsIterator1.next();
 
 		//Loop into the second level of the arguments hash
-		QHashIterator<QString, QString> iterator2(iterator1.value());
-        	while(iterator2.hasNext()) {
+		QHashIterator<QString, QString> ArgumentsIterator2(ArgumentsIterator1.value());
+        	while(ArgumentsIterator2.hasNext()) {
 
-                	iterator2.next();
-                	qInfo() << iterator2.key() << ":" << iterator2.value();
+                	ArgumentsIterator2.next();
+
+			//If the default vale is empty
+			if(ArgumentsIterator2.value().isEmpty()) {
+
+				//Getting the current root directory
+				if((ArgumentsIterator1.key() == "Process") && (ArgumentsIterator2.key() == "Directory"))
+					this->M_Configurations[ArgumentsIterator1.key()][ArgumentsIterator2.key()] = QDir::currentPath();
+
+				//Getting the ip of specified network interface
+				if((ArgumentsIterator1.key() == "Ip") && (ArgumentsIterator2.key() == "Interface")) {
+
+					//qInfo() << "Ip check";
+
+					QNetworkInterface Interface = QNetworkInterface::interfaceFromName(ArgumentsIterator2.value());
+					//qInfo() << Interface;
+					QList<QNetworkAddressEntry> Ips = Interface.addressEntries();
+					//qInfo() << Ips;
+					if (!Ips.isEmpty()) {
+						QNetworkAddressEntry Ip = Ips.first();
+						qInfo() << Ip.ip();
+					}
+
+				}
+
+			} else
+				 this->M_Configurations[ArgumentsIterator1.key()][ArgumentsIterator2.key()] = ArgumentsIterator2.value();
 
         	}
 
 	}
+
+	//Loop into the first level of the arguments hash
+        QHashIterator<QString, QHash<QString, QString>> ConfigurationsIterator1(this->M_Configurations);
+        while(ConfigurationsIterator1.hasNext()) {
+
+                ConfigurationsIterator1.next();
+
+                //Loop into the second level of the arguments hash
+                QHashIterator<QString, QString> ConfigurationsIterator2(ConfigurationsIterator1.value());
+                while(ConfigurationsIterator2.hasNext()) {
+
+                        ConfigurationsIterator2.next();
+
+			qInfo() << "key1: " << ConfigurationsIterator1.key() << " key2: " << ConfigurationsIterator2.key() << " value2: " << ConfigurationsIterator2.value();
+
+                }
+
+        }
+
+
 /*
 	this->M_CCDatabase = CDatabase(this->M_CDatabaseName, this->M_CDatabaseUsername, this->M_CDatabasePassword, this->M_CDirectory, this->M_CLevel);
 	//If the database connection has failed
@@ -67,7 +90,7 @@ CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments
 
         path p_directory;
 	boost::system::error_code error;
-	/*
+
 	//Check the root directory
         if (!directory.empty()) {
 
@@ -205,7 +228,7 @@ CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments
 }
 
 bool CConfiguration::createProcessFile(void) const {
-
+/*
         //Change the current path
 	string filePid = this->M_CDirectory + "/run/" + this->M_CProcessFilename;
 
@@ -243,13 +266,13 @@ bool CConfiguration::createProcessFile(void) const {
 		return false;
 
 	}
-
+*/
 	return true;
 
 }
 
 bool CConfiguration::deleteProcessFile(void) const {
-
+/*
 	path p_filePid = this->M_CDirectory + "/run/"+ this->M_CProcessFilename;
 
 	cout << "delete" << endl;
@@ -261,13 +284,13 @@ bool CConfiguration::deleteProcessFile(void) const {
 		return false;
 
 	}
-
+*/
 	return true;
 
 }
 
 bool CConfiguration::dropUserPrivileges(void) const {
-
+/*
 	auto size = sysconf(_SC_GETPW_R_SIZE_MAX);
 	//Manage the FreeBSD special case when defining the buffer size
         if (size == -1)
@@ -318,12 +341,13 @@ bool CConfiguration::dropUserPrivileges(void) const {
 		this->M_CCDatabase.writeLog("info", "[Configuration] Specified User Group Id : " + to_string(groupId));
 
     	}
+*/
 	return true;
 
 }
 
-bool CConfiguration::load(void) const {
-
+bool CConfiguration::loading(void) const {
+/*
 	//Check if we need to deamonize the executable
 	if(this->M_CProcessStatus) {
 
@@ -366,13 +390,13 @@ bool CConfiguration::load(void) const {
 	//Change the privileges to the new user
 	if(!this->dropUserPrivileges())
 		return false;
-
+*/
 	return true;
 
 }
 
-bool CConfiguration::unload(void) const {
-
+bool CConfiguration::unloading(void) const {
+/*
 	if (this->M_CProcessStatus) {
 
 		//Delete the PID file
@@ -380,7 +404,7 @@ bool CConfiguration::unload(void) const {
 			return false;
 
 	}
-
+*/
 	return true;
 
 }

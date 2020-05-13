@@ -7,10 +7,22 @@
 
 CArgument::CArgument(int total, char *arguments[]) {
 
-	int counter;
+	//Initialize all hash entries
+	this->M_Arguments["Database"]["Name"]	  = "protsion.db";
+	this->M_Arguments["Database"]["Password"] = "protsion";
+	this->M_Arguments["Database"]["User"]	  = "protsion";
+	this->M_Arguments["Ip"]["Interface"]	  = "";
+	this->M_Arguments["Ip"]["Mode"]		  = "ipv4-ipv6";
+	this->M_Arguments["Log"]["Level"]	  = "info";
+	this->M_Arguments["Process"]["Directory"] = "";
+	this->M_Arguments["Process"]["File"]	  = "_protsion.pid";
+	this->M_Arguments["Process"]["Mode"] 	  = "true";
+	this->M_Arguments["Process"]["User"]	  = "protsion";
+
         //Get only the executable name
         QRegExp r_executable("^(.*)/");
 
+	int counter;
         for(counter = 1; counter < total; counter++) {
 
                 if(QString::fromUtf8(arguments[counter]).compare("-d") == 0) {

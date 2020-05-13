@@ -22,33 +22,28 @@ CXXDECLARES	=  	-DC_EXECUTABLEVERSION=\"$(E_VERSION)\" \
 			-DC_COMPILATORVERSION=\"$(C_VERSION)\" \
 			-DC_DATABASENAME=\"$(D_NAME)\" \
                         -DC_DATABASEVERSION=\"$(D_VERSION)\"
-CXXFLAGS	+= 	-std=c++17 \
-			-g \
+CXXFLAGS	+= 	-g \
 			-O2 \
 			-s \
 			-pedantic \
 			-Wall \
 			-fPIC \
-			-I/usr/include/boost \
 			-I/usr/include/x86_64-linux-gnu/qt5/ \
-			-I/usr/include/x86_64-linux-gnu/qt5/QtCore/
+			-I/usr/include/x86_64-linux-gnu/qt5/QtCore/ \
+			-I/usr/include/x86_64-linux-gnu/qt5/QtNetwork/
 DIRSOURCES	=  	../src/
 CXXSOURCES	=  	$(DIRSOURCES)protsion.cpp \
-			$(DIRSOURCES)core/cargument.cpp 
-#\
-#			$(DIRSOURCES)core/cconfiguration.cpp \
+			$(DIRSOURCES)core/cargument.cpp \
+			$(DIRSOURCES)core/cconfiguration.cpp 
 #			$(DIRSOURCES)core/cdatabase.cpp
 DIRRESOURCES	=	$(DIRSOURCES)res/
 CXXRESOURCES	=  	$(wildcard $(DIRRESOURCES)*.*)
 DIREXECUTABLE	=  	../bin/
 CXXEXECUTABLE	=  	$(DIREXECUTABLE)protsion
 LDFLAGS		+= 	-L/home/mooninfo/sylverant/production/sqlite/lib/
-CXXLINKS	+= 	-lboost_system \
-			-lboost_filesystem \
-			-lstdc++fs \
-			-lsqlite3 \
-			-lpthread \
-			-lQt5Core \
+CXXLINKS	+= 	-lQt5Core \
+			-lQt5Network \
+			-lsqlite3
 
 all: protsion
 

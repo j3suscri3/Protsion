@@ -4,7 +4,7 @@
 #include <QHash>
 #include <QString>
 
-#include "cdatabase.hpp"
+//#include "cdatabase.hpp"
 
 class CConfiguration {
 
@@ -13,14 +13,14 @@ class CConfiguration {
 		//Constructor
 		CConfiguration(QHash<QString, QHash<QString, QString>> Arguments);
 		//Load all configurations
-		bool load(void) const;
+		bool loading(void) const;
 		//Unload all configurations
-                bool unload(void) const;
+                bool unloading(void) const;
 
 	private:
 
-		CDatabase M_CDatabase;
-		QHash<QString, QHash<QString, QString>> M_Configuration;
+		//CDatabase M_CDatabase;
+		QHash<QString, QHash<QString, QString>> M_Configurations;
 
 		//Open the process file
                 bool createProcessFile(void) const;
