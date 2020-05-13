@@ -1,6 +1,8 @@
 #include <QDebug>
 #include <QDir>
+#include <QDirIterator>
 #include <QHash>
+#include <QHostInfo>
 #include <QNetworkInterface>
 #include <QString>
 
@@ -24,31 +26,73 @@ CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments
 			if(ArgumentsIterator2.value().isEmpty()) {
 
 				//Getting the current root directory
-				if((ArgumentsIterator1.key() == "Process") && (ArgumentsIterator2.key() == "Directory"))
-					this->M_Configurations[ArgumentsIterator1.key()][ArgumentsIterator2.key()] = QDir::currentPath();
+				if((ArgumentsIterator1.key() == "Process") && (ArgumentsIterator2.key() == "Root"))
+					this->M_Configurations[ArgumentsIterator1.key()][ArgumentsIterator2.key()] = QDir::currentPath() + QString("/");
 
-				//Getting the ip of specified network interface
-				if((ArgumentsIterator1.key() == "Ip") && (ArgumentsIterator2.key() == "Interface")) {
+			} else {
 
-					//qInfo() << "Ip check";
+				//Check the main directory format
+				if((ArgumentsIterator1.key() == "Process") && (ArgumentsIterator2.key() == "Root")
+				&& (!ArgumentsIterator2.value().endsWith("/"))) {
 
-					QNetworkInterface Interface = QNetworkInterface::interfaceFromName(ArgumentsIterator2.value());
-					//qInfo() << Interface;
-					QList<QNetworkAddressEntry> Ips = Interface.addressEntries();
-					//qInfo() << Ips;
-					if (!Ips.isEmpty()) {
-						QNetworkAddressEntry Ip = Ips.first();
-						qInfo() << Ip.ip();
-					}
+					this->M_Configurations[ArgumentsIterator1.key()][ArgumentsIterator2.key()] = ArgumentsIterator2.value() + QString("/");
+					continue;
 
 				}
 
-			} else
-				 this->M_Configurations[ArgumentsIterator1.key()][ArgumentsIterator2.key()] = ArgumentsIterator2.value();
+				//Check the process filename format
+				if((ArgumentsIterator1.key() == "Process") && (ArgumentsIterator2.key() == "File")
+				&& (!ArgumentsIterator2.value().startsWith("_") || !ArgumentsIterator2.value().endsWith(".pid"))) {
+
+					QString Argument = ArgumentsIterator2.value();
+
+					if(!ArgumentsIterator2.value().startsWith("_"))
+						Argument.insert(0, "_");
+
+					if(!ArgumentsIterator2.value().endsWith(".pid"))
+                                         	Argument += ".pid";
+
+					this->M_Configurations[ArgumentsIterator1.key()][ArgumentsIterator2.key()] = Argument;
+					continue;
+
+				}
+
+				//Getting the ip of specified network interface
+                                if((ArgumentsIterator1.key() == "Ip") && (ArgumentsIterator2.key() == "Interface")) {
+
+                                        QNetworkInterface Interface = QNetworkInterface::interfaceFromName(ArgumentsIterator2.value());
+					QList<QNetworkAddressEntry> Ips = Interface.addressEntries();
+
+					for(int AddressesIterator = 0; AddressesIterator < Ips.size(); AddressesIterator++) {
+
+						QHostAddress Ip = Ips.value(AddressesIterator).ip();
+
+						//Getting ipv4
+						if(((Arguments["Ip"]["Mode"] == "ipv4") || (Arguments["Ip"]["Mode"] == "ipv4-ipv6")) && (Ip.protocol()== 0))
+							this->M_Configurations["Ip"]["v4"] = Ip.toString();
+
+						//Getting ipv6
+						if(((Arguments["Ip"]["Mode"] == "ipv6") || (Arguments["Ip"]["Mode"] == "ipv4-ipv6"))
+						&& (Ip.protocol()== 1) && !Ip.toString().contains(ArgumentsIterator2.value()))
+                                                         this->M_Configurations["Ip"]["v6"] = Ip.toString();
+
+					}
+
+					continue;
+
+                                }
+
+				this->M_Configurations[ArgumentsIterator1.key()][ArgumentsIterator2.key()] = ArgumentsIterator2.value();
+
+			}
 
         	}
 
 	}
+
+	this->M_Configurations["Process"]["Path"] = this->M_Configurations["Process"]["Root"] + QString("run/");
+	this->M_Configurations["Database"]["Path"] = this->M_Configurations["Process"]["Root"] + QString("database/");
+	this->M_Configurations["Ip"]["Host"] = QHostInfo::localHostName();
 
 	//Loop into the first level of the arguments hash
         QHashIterator<QString, QHash<QString, QString>> ConfigurationsIterator1(this->M_Configurations);
@@ -68,163 +112,6 @@ CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments
 
         }
 
-
-/*
-	this->M_CCDatabase = CDatabase(this->M_CDatabaseName, this->M_CDatabaseUsername, this->M_CDatabasePassword, this->M_CDirectory, this->M_CLevel);
-	//If the database connection has failed
-	if(!this->M_CCDatabase.open())
-		exit(EXIT_FAILURE);
-
-	mode_t mode = 0660;
-	if(opendir(this->M_CDirectory.c_str()) == NULL) {
-
-		mkdir(this->M_CDirectory.c_str(), mode);
-		cout << "directory not exists" << endl;
-
-	} else {
-
-		cout << "directory exists" << endl;
-
-	}
-
-
-        path p_directory;
-	boost::system::error_code error;
-
-	//Check the root directory
-        if (!directory.empty()) {
-
-                this->M_CDirectory = directory;
-                 //Move to the specified directory
-                p_directory = this->M_CDirectory;
-                current_path(this->M_CDirectory, error);
-
-                if (!exists(p_directory)) {
-
-                        if (!create_directories(this->M_CDirectory)) {
-
-                                this->M_CCDatabase.writeLog("error", "Can't create the root directory " + this->M_CDirectory);
-                                exit(EXIT_FAILURE);
-
-                        }
-
-                }
-
-		current_path(this->M_CDirectory, error);
-
-        } else {
-
-                this->M_CDirectory = canonical(current_path()).string() + "/..";
-		current_path(this->M_CDirectory, error);
-		this->M_CDirectory = canonical(current_path()).string();
-
-	}
-
-        this->M_CCDatabase.writeLog("info", "[Configuration] Root (directory) : " + this->M_CDirectory);
-
-	cout << this->M_CDirectory << endl;
-
-	//Check the process launching mode
-        if (!processStatus)
-                this->M_CProcessStatus = processStatus ? "daemonize" : "not daemonize";
-        this->M_CCDatabase.writeLog("info", "[Configuration] Process (mode) : " + this->M_CProcessStatus);
-
-        //Check the process launching username
-        if (!processUsername.empty())
-                this->M_CProcessUsername = processUsername;
-        this->M_CCDatabase.writeLog("info", "[Configuration] Launcher (user) : " + this->M_CProcessUsername);
-
-	//Check the database sub-directory
-        p_directory = "database";
-        if (!exists(p_directory))
-                create_directory(p_directory);
-        this->M_CCDatabase.writeLog("info", "[Configuration] Database (path) : " + this->M_CDirectory + "/" + p_directory.c_str() + "/");
-
-	this->M_CCDatabase.writeLog("info", "[Configuration] Database (file) : " + this->M_CDatabaseName);
-	this->M_CCDatabase.writeLog("info", "[Configuration] Database (user) : " + this->M_CDatabaseUsername);
-	this->M_CCDatabase.writeLog("info", "[Configuration] Database (password) : " + this->M_CDatabasePassword);
-
-	//Rename the database file
-      	directory = canonical(current_path()).string();
-        for (const auto & i_file : std::filesystem::directory_iterator(directory)) {
-
-		//If the database name isn't already exists
-                if (!boost::algorithm::ends_with(canonical(i_file.path()).string(), this->M_CDatabaseName))
-	        	//When the current database file has found
-                	if (boost::algorithm::ends_with(canonical(i_file.path()).string(), ".db"))
-        	        	//Rename it with the new name
-                        	std::filesystem::rename(i_file.path(), directory + this->M_CDatabaseName);
-
-        }
-
-	//Check the pid sub-directory
-        p_directory = "run";
-        if (!exists(p_directory))
-		create_directory(p_directory);
-	this->M_CCDatabase.writeLog("info", "[Configuration] PID (path) : " + this->M_CDirectory + "/" + p_directory.c_str()+ "/");
-
-	//Check the pid file name
-	if (!processFilename.empty()) {
-
-		if (processFilename.substr(processFilename.find_last_of(".") + 1) == "pid")
-                	this->M_CProcessFilename = processFilename;
-		else
-                        this->M_CProcessFilename = "_" + processFilename + ".pid";
-
-        }
-	this->M_CCDatabase.writeLog("info", "[Configuration] PID (file) : " + this->M_CProcessFilename);
-
-	//Check the log level
-	if (!logLevel.empty())
-                this->M_CLogLevel = logLevel;
-	this->M_CCDatabase.writeLog("info", "[Configuration] Log (level) : " + this->M_CLogLevel);
-
-	//Get the host name
-	this->M_CHostname = host_name();
-	this->M_CCDatabase.writeLog("info", "[Configuration] Host (name) : " + this->M_CHostname);
-
-	//Get the ip mode(s) choosen
-	if (!ipMode.empty())
-        	this->M_CIpMode = ipMode;
-	this->M_CCDatabase.writeLog("info", "[Configuration] Ip (mode) : " + this->M_CIpMode);
-
-	//Get the specified network interface ipv4 and/or ipv6 with its name
-	if (!interface.empty()) {
-
-		//Create the main service
-		boost::asio::io_service io_service;
-		//Create the resolver
-        	tcp::resolver resolver(io_service);
-		//Configure the resolver on localhost
-		tcp::resolver::query query("localhost", "");
-		//Get the iterator list
-		tcp::resolver::iterator iterator = resolver.resolve(query);
-
-		//For each network interface
-		while (iterator != tcp::resolver::iterator()) {
-
-			address ip = (iterator++)->endpoint().address();
-
-			//Get the ipv4 address
-			if (this->M_CIpMode != "ipv6" && !ip.is_v6()) {
-
-				this->M_CIpv4 = ip.to_string();
-				this->M_CCDatabase.writeLog("info", "[Configuration] Ip (v4) : " + this->M_CIpv4);
-
-			}
-
-			//Get the ipv6 address
-                        if (this->M_CIpMode != "ipv4" && ip.is_v6()) {
-
-				this->M_CIpv6 = ip.to_string();
-				this->M_CCDatabase.writeLog("info", "[Configuration] Ip (v6) : " + this->M_CIpv6);
-
-                        }
-
-		}
-
-	}
-*/
 }
 
 bool CConfiguration::createProcessFile(void) const {
@@ -347,6 +234,72 @@ bool CConfiguration::dropUserPrivileges(void) const {
 }
 
 bool CConfiguration::loading(void) const {
+
+	//Check the process root
+	if(!QDir(this->M_Configurations["Process"]["Root"]).exists())
+		QDir().mkdir(this->M_Configurations["Process"]["Root"]);
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Process (Root) : " + this->M_Configurations["Process"]["Root"]);
+
+	//Check the process launching mode
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Process (Mode) : " + this->M_Configurations["Process"]["Mode"]);
+
+	//Check the process path
+	if(!QDir(this->M_Configurations["Process"]["Path"]).exists())
+		QDir().mkdir(this->M_Configurations["Process"]["Path"]);
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Process (Pathname) : " + this->M_Configurations["Process"]["Path"]);
+
+	//Check the process file
+	if(this->M_Configurations["Process"]["Mode"] == "true")
+		//this->M_CCDatabase.writeLog("info", "[Configuration] Process (Filename) : " + this->M_Configurations["Process"]["File"]);
+
+	//Check the process launching username
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Process (Username) : " + this->M_Configurations["Process"]["Username"]);
+
+	//Check the log level
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Log (level) : " + this->M_Configurations["Log"]["level"]);
+
+	//Check the database path
+	if(!QDir(this->M_Configurations["Database"]["Path"]).exists())
+                QDir().mkdir(this->M_Configurations["Database"]["Path"]);
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Database (Pathname) : " + this->M_Configurations["Database"]["Path"]);
+
+	//Check the database name
+	QDirIterator databaseIterator(this->M_Configurations["Database"]["Path"], QDirIterator::NoIteratorFlags);
+	while(databaseIterator.hasNext()) {
+
+		QString file = databaseIterator.next();
+
+		if(file.endsWith(".db"))
+			QDir().rename(file, this->M_Configurations["Database"]["Path"] + this->M_Configurations["Database"]["Name"] + ".db");
+
+	}
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Database (Name) : " + this->M_Configurations["Database"]["Name"]);
+
+	//Check the database username
+        //this->M_CCDatabase.writeLog("info", "[Configuration] Database (Username) : " + this->M_Configurations["Database"]["Username"]);
+
+	//Check the database password
+        //this->M_CCDatabase.writeLog("info", "[Configuration] Database (Password) : " + this->M_Configurations["Database"]["Password"]);
+
+	//Check the hostname
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Ip (Hostname) : " + this->M_Configurations["Ip"]["Hostname"]);
+
+	//Check the ip mode
+	//this->M_CCDatabase.writeLog("info", "[Configuration] Ip (Mode) : " + this->M_Configurations["Ip"]["Mode"]);
+
+	//Check the ipv4/ipv6
+	if(!this->M_Configurations["Ip"]["Interface"].isEmpty()) {
+
+		if(!this->M_Configurations["Ip"]["v4"].isEmpty())
+			int a=2;
+			//this->M_CCDatabase.writeLog("info", "[Configuration] Ip (v4) : " + this->M_Configurations["Ip"]["v4"]);
+
+		if(!this->M_Configurations["Ip"]["v6"].isEmpty())
+			int b=3;
+                        //this->M_CCDatabase.writeLog("info", "[Configuration] Ip (v6) : " + this->M_Configurations["Ip"]["v6"]);
+
+	}
+
 /*
 	//Check if we need to deamonize the executable
 	if(this->M_CProcessStatus) {

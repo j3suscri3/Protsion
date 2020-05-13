@@ -14,7 +14,7 @@ CArgument::CArgument(int total, char *arguments[]) {
 	this->M_Arguments["Ip"]["Interface"]	  = "";
 	this->M_Arguments["Ip"]["Mode"]		  = "ipv4-ipv6";
 	this->M_Arguments["Log"]["Level"]	  = "info";
-	this->M_Arguments["Process"]["Directory"] = "";
+	this->M_Arguments["Process"]["Root"] 	  = "";
 	this->M_Arguments["Process"]["File"]	  = "_protsion.pid";
 	this->M_Arguments["Process"]["Mode"] 	  = "true";
 	this->M_Arguments["Process"]["User"]	  = "protsion";
@@ -43,7 +43,7 @@ CArgument::CArgument(int total, char *arguments[]) {
                         }
 
                         //Save the custom directory name
-			this->M_Arguments["Process"]["Directory"] = arguments[counter+1];
+			this->M_Arguments["Process"]["Root"] = arguments[counter+1];
                         counter += 1;
                         continue;
 
@@ -145,11 +145,11 @@ CArgument::CArgument(int total, char *arguments[]) {
                         //Define the regex for gettinf all database configurations
 			QRegExp r_databaseName(":(.*)"), r_databaseUsername("^(.*):|@(.*)$"), r_databasePassword("^(.*)@");
                         //Get the database name
-                        this->M_Arguments["Database"]["Name"] = QString::fromUtf8(arguments[0]).replace(r_databaseName, "");
+                        this->M_Arguments["Database"]["Name"] = QString::fromUtf8(arguments[counter+1]).replace(r_databaseName, "");
                         //Get the database username
-                        this->M_Arguments["Database"]["User"] = QString::fromUtf8(arguments[0]).replace(r_databaseUsername, "");
+                        this->M_Arguments["Database"]["User"] = QString::fromUtf8(arguments[counter+1]).replace(r_databaseUsername, "");
                         //Get the database password
-                        this->M_Arguments["Database"]["Password"] = QString::fromUtf8(arguments[0]).replace(r_databasePassword, "");
+                        this->M_Arguments["Database"]["Password"] = QString::fromUtf8(arguments[counter+1]).replace(r_databasePassword, "");
 
                         counter += 1;
                         continue;

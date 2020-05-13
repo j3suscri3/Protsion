@@ -8,13 +8,13 @@ int main(int argc, char *argv[]) {
 
 	//Initialize the configuration with the executable arguments
 	CConfiguration Configuration(Argument.getting());
-/*
-	//Load all configurations
-        if(!Configuration.load())
-		exit(EXIT_FAILURE);
 
+	//Load all configurations
+        if(!Configuration.loading())
+		exit(EXIT_FAILURE);
+/*
         //Unload all configurations
-        if(!Configuration.unload())
+        if(!Configuration.unloading())
         	exit(EXIT_FAILURE);
 */
 	exit(EXIT_SUCCESS);
