@@ -5,6 +5,7 @@
 #include <QString>
 
 //#include "cdatabase.hpp"
+#include "cprocess.hpp"
 
 class CConfiguration {
 
@@ -20,14 +21,8 @@ class CConfiguration {
 	private:
 
 		//CDatabase M_CDatabase;
+		CProcess M_CProcess;
 		QHash<QString, QHash<QString, QString>> M_Configurations;
-
-		//Open the process file
-                bool createProcessFile(void) const;
-		//Delete the process file
-                bool deleteProcessFile(void) const;
-		//Drop the user privileges
-		bool dropUserPrivileges(void) const;
 
 };
 

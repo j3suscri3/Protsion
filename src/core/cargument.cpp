@@ -31,22 +31,6 @@ CArgument::CArgument(int total, char *arguments[]) {
 			this->M_Arguments["Process"]["Mode"] = "false";
                         continue;
 
-                } else if(QString::fromUtf8(arguments[counter]).compare("-D") == 0) {
-
-                        //Argument incompleted
-                        if((counter == total-1) || QString::fromUtf8(arguments[counter+1]).isEmpty()) {
-
-                                qInfo() << "\n-D requires an argument!\n";
-                                this->showingHelp(QString::fromUtf8(arguments[0]).replace(r_executable, ""));
-                                exit(EXIT_FAILURE);
-
-                        }
-
-                        //Save the custom directory name
-			this->M_Arguments["Process"]["Root"] = arguments[counter+1];
-                        counter += 1;
-                        continue;
-
                 } else if(QString::fromUtf8(arguments[counter]).compare("-h") == 0) {
 
                         this->showingHelp(QString::fromUtf8(arguments[0]).replace(r_executable, ""));
@@ -118,6 +102,22 @@ CArgument::CArgument(int total, char *arguments[]) {
 
                         //Save the custom pid file name
                         this->M_Arguments["Process"]["File"] = arguments[counter+1];
+                        counter += 1;
+                        continue;
+
+		 } else if(QString::fromUtf8(arguments[counter]).compare("-R") == 0) {
+
+                        //Argument incompleted
+                        if((counter == total-1) || QString::fromUtf8(arguments[counter+1]).isEmpty()) {
+
+                                qInfo() << "\n-R requires an argument!\n";
+                                this->showingHelp(QString::fromUtf8(arguments[0]).replace(r_executable, ""));
+                                exit(EXIT_FAILURE);
+
+                        }
+
+                        //Save the custom directory name
+                        this->M_Arguments["Process"]["Root"] = arguments[counter+1];
                         counter += 1;
                         continue;
 
@@ -195,10 +195,10 @@ QHash<QString, QHash<QString, QString>> CArgument::getting(void) const {
 
 void CArgument::showingHelp(QString executable) const {
 
-	qInfo() << "Usage: " << executable << " [-d] [-D <directory>] [-h] [-I <mode> | <interface>] [-l <level>]";
-	qInfo() << "		[-S <database:user@password>] [-U <user>] [-v]\n";
+	qInfo() << "Usage: " << executable << " [-d] [-h] [-I <mode> | <interface>] [-l <level>] [-p <file>]";
+	qInfo() << "		[-R <directory>] [-S <database:user@password>] [-U <user>] [-v]\n";
 	qInfo() << "-d			      Run " << executable << " not like a daemon.";
-	qInfo() << "-D <directory>		      Define the specified directory as the root.";
+	qInfo() << "-R <directory>		      Define the specified directory as the root.";
 	qInfo() << "-h			      Print this help page.";
 	qInfo() << "-I <mode> <interface>         Specify the ip mode and the network interface name";
 	qInfo() << "			      ipv4 / ipv6 / ipv4-ipv6 (mode by default).";
