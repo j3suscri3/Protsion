@@ -22,6 +22,10 @@ CProcess::CProcess(QHash<QString, QString> Configurations) {
 }
 
 bool CProcess::changing(void) const {
+
+#ifdef Q_OS_UNIX
+
+	QProcess::execute("id -u" + this->));
 /*
         auto size = sysconf(_SC_GETPW_R_SIZE_MAX);
         //Manage the FreeBSD special case when defining the buffer size
@@ -59,6 +63,8 @@ bool CProcess::changing(void) const {
                 this->M_CCDatabase.writeLog("info", "[Configuration] Specified User Group Id : " + to_string(groupId));
         }
 */
+#endif
+
         return true;
 
 }

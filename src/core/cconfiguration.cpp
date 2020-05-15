@@ -8,7 +8,7 @@
 
 #include "cconfiguration.hpp"
 
-CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments) {
+CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments) : M_CProcess(NULL) {
 
 	//Loop into the first level of the arguments hash
 	QHashIterator<QString, QHash<QString, QString>> ArgumentsIterator1(Arguments);
@@ -94,7 +94,7 @@ CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments
 	this->M_Configurations["Database"]["Path"] = QDir::currentPath() + QString("/database/");
 	this->M_Configurations["Ip"]["Host"] = QHostInfo::localHostName();
 
-	this->M_CProcess = CProcess(this->M_Configurations.value("Process"));
+	this->M_CProcess = CProcess(this->M_Configurations["Process"]);
 
 	//Loop into the first level of the arguments hash
         QHashIterator<QString, QHash<QString, QString>> ConfigurationsIterator1(this->M_Configurations);
