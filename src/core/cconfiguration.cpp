@@ -94,6 +94,8 @@ CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments
 	this->M_Configurations["Database"]["Path"] = QDir::currentPath() + QString("/database/");
 	this->M_Configurations["Ip"]["Host"] = QHostInfo::localHostName();
 
+	this->M_CProcess = CProcess(this->M_Configurations.value("Process"));
+
 	//Loop into the first level of the arguments hash
         QHashIterator<QString, QHash<QString, QString>> ConfigurationsIterator1(this->M_Configurations);
         while(ConfigurationsIterator1.hasNext()) {
@@ -114,7 +116,7 @@ CConfiguration::CConfiguration(QHash<QString, QHash<QString, QString>> Arguments
 
 }
 
-bool CConfiguration::loading(void) const {
+bool CConfiguration::loading(void) {
 
 	//Check the process root
 	if(!QDir(this->M_Configurations["Process"]["Root"]).exists())
@@ -172,11 +174,11 @@ bool CConfiguration::loading(void) const {
 	if(!this->M_Configurations["Ip"]["Interface"].isEmpty()) {
 
 		if(!this->M_Configurations["Ip"]["v4"].isEmpty())
-			int a=2;
+			qInfo() << "T";
 			//this->M_CCDatabase.writeLog("info", "[Configuration] Ip (v4) : " + this->M_Configurations["Ip"]["v4"]);
 
 		if(!this->M_Configurations["Ip"]["v6"].isEmpty())
-			int b=3;
+			qInfo() << "T";
                         //this->M_CCDatabase.writeLog("info", "[Configuration] Ip (v6) : " + this->M_Configurations["Ip"]["v6"]);
 
 	}
@@ -184,18 +186,16 @@ bool CConfiguration::loading(void) const {
 	//Check if we need to deamonize the executable
 	if(this->M_Configurations["Process"]["Mode"] == "true") {
 
-		this->M_CProcess = CProcess(this->M_Configurations);
-
 		//Check if the process file already exists
-		if(!this->M_CProcess.checking())
+		if(!this->M_CProcess.checking()) {
+
 			//Create the process file
-                	if (!this->M_CProcess.creating())
+                	if(!this->M_CProcess.creating())
 				return false;
 
-		else {
+		} else {
 
 			//this->M_CCDatabase.writeLog("error", "The server is already running!");
-
 			return false;
 
 		}

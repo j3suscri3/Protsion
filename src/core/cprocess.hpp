@@ -9,15 +9,15 @@ class CProcess {
         public:
 
                 //Constructor
-                CProcess(QHash<QString, QHash<QString, QString>> Configurations);
+                CProcess(QHash<QString, QString> Configurations);
+		//Change the user privileges
+                bool changing(void) const;
 		//Check the process fileexistance
-		bool checking(void) const;
+		bool checking(void);
 		//Open the process file
                 bool creating(void) const;
                 //Delete the process file
                 bool deleting(void) const;
-                //Change the user privileges
-                bool changing(void) const;
 
         private:
 

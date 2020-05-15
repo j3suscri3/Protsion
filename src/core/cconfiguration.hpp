@@ -14,7 +14,7 @@ class CConfiguration {
 		//Constructor
 		CConfiguration(QHash<QString, QHash<QString, QString>> Arguments);
 		//Load all configurations
-		bool loading(void) const;
+		bool loading(void);
 		//Unload all configurations
                 bool unloading(void) const;
 

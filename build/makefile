@@ -34,7 +34,8 @@ CXXFLAGS	+= 	-g \
 DIRSOURCES	=  	../src/
 CXXSOURCES	=  	$(DIRSOURCES)protsion.cpp \
 			$(DIRSOURCES)core/cargument.cpp \
-			$(DIRSOURCES)core/cconfiguration.cpp 
+			$(DIRSOURCES)core/cconfiguration.cpp \
+			$(DIRSOURCES)core/cprocess.cpp
 #			$(DIRSOURCES)core/cdatabase.cpp
 DIRRESOURCES	=	$(DIRSOURCES)res/
 CXXRESOURCES	=  	$(wildcard $(DIRRESOURCES)*.*)
