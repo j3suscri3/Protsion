@@ -4,20 +4,24 @@
 #include <QHash>
 #include <QString>
 
+#include "cdatabase.hpp"
+
 class CProcess {
 
         public:
 
                 //Constructor
                 CProcess(QHash<QString, QString> Configurations);
+		//Destructor
+		~CProcess();
 		//Change the user privileges
-                bool changing(void) const;
+                bool changing(CDatabase Database) const;
 		//Check the process fileexistance
-		bool checking(void);
+		bool checking(CDatabase Database);
 		//Open the process file
-                bool creating(void) const;
+                bool creating(CDatabase Database) const;
                 //Delete the process file
-                bool deleting(void) const;
+                bool deleting(CDatabase Database) const;
 
         private:
 

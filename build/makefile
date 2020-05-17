@@ -30,21 +30,22 @@ CXXFLAGS	+= 	-g \
 			-fPIC \
 			-I/usr/include/x86_64-linux-gnu/qt5/ \
 			-I/usr/include/x86_64-linux-gnu/qt5/QtCore/ \
-			-I/usr/include/x86_64-linux-gnu/qt5/QtNetwork/
+			-I/usr/include/x86_64-linux-gnu/qt5/QtNetwork/ \
+			-I/usr/include/x86_64-linux-gnu/qt5/QtSql/
 DIRSOURCES	=  	../src/
 CXXSOURCES	=  	$(DIRSOURCES)protsion.cpp \
 			$(DIRSOURCES)core/cargument.cpp \
 			$(DIRSOURCES)core/cconfiguration.cpp \
-			$(DIRSOURCES)core/cprocess.cpp
-#			$(DIRSOURCES)core/cdatabase.cpp
+			$(DIRSOURCES)core/cprocess.cpp \
+			$(DIRSOURCES)core/cdatabase.cpp
 DIRRESOURCES	=	$(DIRSOURCES)res/
 CXXRESOURCES	=  	$(wildcard $(DIRRESOURCES)*.*)
 DIREXECUTABLE	=  	../bin/
 CXXEXECUTABLE	=  	$(DIREXECUTABLE)protsion
-LDFLAGS		+= 	-L/home/mooninfo/sylverant/production/sqlite/lib/
+LDFLAGS		+= 	
 CXXLINKS	+= 	-lQt5Core \
 			-lQt5Network \
-			-lsqlite3
+			-lQt5Sql
 
 all: protsion
 

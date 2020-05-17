@@ -8,12 +8,12 @@
 CArgument::CArgument(int total, char *arguments[]) {
 
 	//Initialize all hash entries
+	this->M_Arguments["Database"]["Log"]      = "info";
 	this->M_Arguments["Database"]["Name"]	  = "protsion.db";
 	this->M_Arguments["Database"]["Password"] = "protsion";
 	this->M_Arguments["Database"]["User"]	  = "protsion";
 	this->M_Arguments["Ip"]["Interface"]	  = "";
 	this->M_Arguments["Ip"]["Mode"]		  = "ipv4-ipv6";
-	this->M_Arguments["Log"]["Level"]	  = "info";
 	this->M_Arguments["Process"]["Root"] 	  = "";
 	this->M_Arguments["Process"]["File"]	  = "_protsion.pid";
 	this->M_Arguments["Process"]["Mode"] 	  = "true";
@@ -85,7 +85,7 @@ CArgument::CArgument(int total, char *arguments[]) {
                         }
 
                         //Save the custom log level file
-                        this->M_Arguments["Log"]["Level"] = arguments[counter+1];
+                        this->M_Arguments["Database"]["Log"] = arguments[counter+1];
                         counter += 1;
                         continue;
 
@@ -184,6 +184,10 @@ CArgument::CArgument(int total, char *arguments[]) {
                 }
 
         }
+
+}
+
+CArgument::~CArgument() {
 
 }
 

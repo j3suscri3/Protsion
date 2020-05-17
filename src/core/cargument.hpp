@@ -10,6 +10,8 @@ class CArgument {
 
 		//Constructor
 		CArgument(int total, char *arguments[]);
+		//Destructor
+		~CArgument();
 		//Get the arguments table
 		QHash<QString, QHash<QString, QString>> getting(void) const;
 		//Show the helper

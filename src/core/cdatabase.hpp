@@ -1,29 +1,32 @@
 #ifndef CDATABASE_HPP
 #define CDATABASE_HPP
 
+#include <QHash>
 #include <QString>
+#include <QtSql>
 
-#include "../extra/sqlite3.h"
 
 class CDatabase {
 
 	public:
 
 		//Constructor
-		CDatabase(QString database, QString username, QString password, QString directory, QString level);
+		CDatabase(QHash<QString, QString> Configurations);
+		//Desctructor
+		~CDatabase();
 		//Connection to the specific database
-                bool open(void);
+                bool opening(void);
 		//Close from the specific database
-		bool close(void);
+		bool closing(void);
 		//Write a new log entry ot the file
-		bool log(QString message) const;
+		bool logging(QString Message) const;
 		//Write a new log entry to the database
-		bool writeLog(QString level, QString message) const;
+		bool writingLog(QString Level, QString Message) const;
 
 	private:
 
-		QString M_CDatabase, M_CUsername, M_CPassword, M_CDirectory, M_CLevel;
-		sqlite3 *M_CSqlite;
+		QHash<QString, QString> M_Database;
+		QSqlDatabase M_Sql;
 
 };
 
